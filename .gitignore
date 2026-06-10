@@ -1,0 +1,105 @@
+# ============================================================
+# Secrets & local config  (ASLA commit edilmemeli!)
+# ============================================================
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets.json
+
+# ============================================================
+# Python
+# ============================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.Python
+
+# Sanal ortamlar
+.venv/
+venv/
+env/
+ENV/
+
+# Test / cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ============================================================
+# Büyük binary varlıklar (3B modeller, HDRI, doku, arşiv)
+# ~600MB+ — Git'e değil, harici depolamaya / Git LFS'e gitmeli
+# ============================================================
+models/
+hdri/
+texture/
+zip/
+
+# Blender dosyaları ve yedekleri
+*.blend
+*.blend1
+*.blend2
+
+# 3B model formatları
+*.fbx
+*.obj
+*.glb
+*.gltf
+*.stl
+*.ply
+*.usd
+*.usdz
+
+# HDRI / yüksek dinamik aralık görüntüler
+*.exr
+*.hdr
+
+# Büyük arşivler
+*.zip
+*.7z
+*.rar
+*.tar
+*.tar.gz
+# (Eklenti zip'ini takip etmek istersen aşağıdaki satırı aç)
+# !asset-library-mcp/asset_library_mcp_addon.zip
+
+# ============================================================
+# Üretilen / geçici çıktılar
+# ============================================================
+asset-library-mcp/generated_views/
+asset-library-mcp/thumbnails/
+asset-library-mcp/trash/
+
+# ============================================================
+# Node / web UI (varsa)
+# ============================================================
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# ============================================================
+# Editör & OS
+# ============================================================
+.vscode/
+.idea/
+*.swp
+*~
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# macOS
+.DS_Store
+
+# ============================================================
+# Loglar
+# ============================================================
+*.log

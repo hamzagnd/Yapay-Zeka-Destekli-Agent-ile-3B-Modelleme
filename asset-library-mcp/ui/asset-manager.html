@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asset Manager — Katalog Yönetimi</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Segoe UI', system-ui, sans-serif; }
+    .spinner { border: 3px solid #e2e8f0; border-top-color: #6366f1; border-radius: 50%;
+               width: 20px; height: 20px; animation: spin 0.8s linear infinite; display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .zip-card { transition: all 0.15s; }
+    .zip-card:hover { transform: translateY(-2px); }
+    .zip-card.selected { border-color: #6366f1 !important; box-shadow: 0 0 0 3px rgba(99,102,241,0.2); }
+    #log-box { font-family: 'Cascadia Code','Fira Code',monospace; font-size: 11px;
+               white-space: pre-wrap; line-height: 1.5; }
+    .log-ok   { color: #22c55e; }
+    .log-err  { color: #ef4444; }
+    .log-info { color: #94a3b8; }
+    .log-head { color: #a78bfa; font-weight: bold; }
+    .cat-chip { display: inline-block; }
+  </style>
+</head>
+<body class="bg-gray-950 min-h-screen text-gray-100">
+
+<!-- HEADER -->
+<header class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between">
+  <div class="flex items-center gap-3">
+    <span class="text-2xl">📦</span>
+    <div>
+      <h1 class="text-lg font-bold text-white">Asset Manager</h1>
+      <p class="text-xs text-gray-400">Zip → Katalog ekleme paneli</p>
+    </div>
+  </div>
+  <div class="flex items-center gap-4">
+    <a href="/" class="text-xs text-gray-400 hover:text-white transition-colors">← Ana UI</a>
+    <div id="api-status" class="flex items-center gap-1.5 text-xs text-gray-500">
+      <span id="api-dot" class="w-2 h-2 rounded-full bg-gray-600 inline-block"></span>
+      <span id="api-label">Bağlanıyor...</span>
+    </div>
+  </div>
+</header>
+
+<div class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+  <!-- ── LEFT: Zip List ─────────────────────────────────────────── -->
+  <div class="xl:col-span-2 flex flex-col gap-4">
+
+    <!-- Zip files panel -->
+    <section class="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-semibold text-gray-100">📁 Zip Dosyaları</h2>
+        <button onclick="loadZips()"
+          class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 px-3 py-1.5 rounded-lg transition-colors">
+          ↺ Yenile
+        </button>
+      </div>
+      <div id="zip-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+        <div class="col-span-full text-center py-8 text-gray-600 text-sm">Yükleniyor...</div>
+      </div>
+    </section>
+
+    <!-- Add form (shown when a zip is selected) -->
+    <section id="add-form" class="hidden bg-gray-900 border border-indigo-800 rounded-2xl p-5">
+      <div class="flex items-start justify-between mb-4">
+        <div>
+          <h2 class="text-base font-semibold text-gray-100">✦ Seçilen Zip</h2>
+          <p id="form-filename" class="text-xs text-indigo-400 font-mono mt-0.5"></p>
+        </div>
+        <button onclick="deselectZip()" class="text-gray-500 hover:text-gray-200 text-sm">✕</button>
+      </div>
+
+      <!-- Zip contents preview -->
+      <div id="zip-preview" class="mb-4 bg-gray-800 rounded-xl p-3 text-xs space-y-1.5"></div>
+
+      <!-- Form fields -->
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-400 mb-1">Görünen İsim</label>
+          <input id="field-name" type="text"
+            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="Coffee Cart 01" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-400 mb-1">ID <span class="text-gray-600">(otomatik)</span></label>
+          <input id="field-id" type="text"
+            class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-sm text-white font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            placeholder="coffee_cart_01" />
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 mb-4">
+        <label class="flex items-center gap-2 cursor-pointer select-none">
+          <input type="checkbox" id="field-llm" checked class="rounded accent-indigo-500" />
+          <span class="text-xs text-gray-400">Gemini ile kategori rafine et</span>
+        </label>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="startAddAsset()" id="btn-add"
+          class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl text-sm font-semibold transition-colors">
+          <span id="btn-add-icon">✦</span>
+          <span id="btn-add-label">Kataloga Ekle</span>
+        </button>
+        <span id="add-status" class="text-xs text-gray-400 flex-1"></span>
+      </div>
+    </section>
+
+    <!-- Log output -->
+    <section id="log-section" class="hidden bg-gray-950 border border-gray-800 rounded-2xl p-4">
+      <div class="flex items-center justify-between mb-2">
+        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Log Çıktısı</p>
+        <div class="flex items-center gap-2">
+          <span id="log-status-badge" class="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-400">Çalışıyor...</span>
+          <button onclick="document.getElementById('log-box').textContent=''"
+            class="text-xs text-gray-600 hover:text-gray-300">Temizle</button>
+        </div>
+      </div>
+      <div id="log-box"
+        class="bg-gray-900 rounded-xl p-3 h-64 overflow-y-auto text-gray-300 leading-relaxed"></div>
+    </section>
+
+  </div>
+
+  <!-- ── RIGHT: Catalog list ─────────────────────────────────────── -->
+  <div class="flex flex-col gap-4">
+
+    <section class="bg-gray-900 border border-gray-800 rounded-2xl p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-semibold text-gray-100">📋 Katalog</h2>
+        <button onclick="loadCatalog()"
+          class="text-xs text-gray-400 hover:text-white bg-gray-800 hover:bg-gray-700 px-3 py-1.5 rounded-lg transition-colors">
+          ↺ Yenile
+        </button>
+      </div>
+      <p id="catalog-count" class="text-xs text-gray-500 mb-3"></p>
+
+      <!-- Search -->
+      <input id="catalog-search" type="search" placeholder="Ara..."
+        oninput="filterCatalog(this.value)"
+        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-1.5 text-xs text-white mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+
+      <div id="catalog-list" class="space-y-1.5 max-h-[600px] overflow-y-auto pr-1">
+        <p class="text-xs text-gray-600 text-center py-4">Yükleniyor...</p>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:8080';
+let _zips       = [];
+let _selZip     = null;
+let _allAssets  = [];
+let _pollTimer  = null;
+let _jobId      = null;
+
+// ── API status check ───────────────────────────────────────────
+async function checkApi() {
+  try {
+    const r = await fetch(`${API}/health`, { signal: AbortSignal.timeout(3000) });
+    const d = await r.json();
+    document.getElementById('api-dot').className   = 'w-2 h-2 rounded-full bg-green-400 inline-block';
+    document.getElementById('api-label').textContent = 'API ✓';
+  } catch {
+    document.getElementById('api-dot').className   = 'w-2 h-2 rounded-full bg-red-500 inline-block';
+    document.getElementById('api-label').textContent = 'API bağlı değil';
+  }
+}
+
+// ── Zip list ───────────────────────────────────────────────────
+async function loadZips() {
+  const grid = document.getElementById('zip-grid');
+  grid.innerHTML = '<div class="col-span-full text-center py-6"><div class="spinner mx-auto"></div></div>';
+  try {
+    const r = await fetch(`${API}/asset-manager/zips`);
+    const d = await r.json();
+    _zips = d.zips || [];
+    renderZips();
+  } catch (e) {
+    grid.innerHTML = `<div class="col-span-full text-center py-6 text-red-400 text-xs">❌ ${e.message}</div>`;
+  }
+}
+
+function renderZips() {
+  const grid = document.getElementById('zip-grid');
+  if (!_zips.length) {
+    grid.innerHTML = '<div class="col-span-full text-center py-6 text-gray-600 text-sm">zip/ klasöründe dosya yok</div>';
+    return;
+  }
+  grid.innerHTML = _zips.map(z => {
+    const isSel = _selZip?.filename === z.filename;
+    const hasErr = !!z.error;
+    return `<div onclick="selectZip('${escHtml(z.filename)}')"
+      class="zip-card cursor-pointer bg-gray-800 border-2 ${isSel ? 'border-indigo-500' : 'border-gray-700'} rounded-xl p-3 ${isSel ? 'selected' : ''}">
+      <div class="text-2xl mb-2">${hasErr ? '⚠️' : '📦'}</div>
+      <p class="text-xs font-semibold text-gray-200 leading-tight truncate mb-1" title="${escHtml(z.filename)}">${escHtml(z.filename)}</p>
+      ${hasErr
+        ? `<p class="text-[10px] text-red-400">${escHtml(z.error)}</p>`
+        : `<p class="text-[10px] text-gray-500">${z.blend_count} blend · ${z.tex_count} tex · ${z.size_mb} MB</p>`}
+    </div>`;
+  }).join('');
+}
+
+async function selectZip(filename) {
+  _selZip = _zips.find(z => z.filename === filename);
+  if (!_selZip) return;
+  renderZips();
+
+  document.getElementById('add-form').classList.remove('hidden');
+  document.getElementById('form-filename').textContent = filename;
+  document.getElementById('zip-preview').innerHTML = '<div class="spinner"></div>';
+  document.getElementById('add-status').textContent = '';
+
+  try {
+    const r = await fetch(`${API}/asset-manager/zip/preview`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filepath: _selZip.filepath }),
+    });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+
+    // Auto-fill form
+    document.getElementById('field-name').value = d.default_name || '';
+    document.getElementById('field-id').value   = d.default_id   || '';
+
+    // Render preview
+    const texLine = d.textures?.length
+      ? `<div class="text-gray-400">🖼 ${d.textures.length} texture: ${d.textures.slice(0,3).map(t => t.split('/').pop()).join(', ')}${d.textures.length > 3 ? '…' : ''}</div>`
+      : '<div class="text-gray-600">Texture yok</div>';
+    document.getElementById('zip-preview').innerHTML =
+      d.blends.map(b => `<div class="text-emerald-400 font-semibold">✦ ${escHtml(b)}</div>`).join('') +
+      texLine +
+      (d.others?.length ? `<div class="text-gray-600">${d.others.length} diğer dosya</div>` : '');
+  } catch (e) {
+    document.getElementById('zip-preview').innerHTML = `<span class="text-red-400">❌ ${escHtml(e.message)}</span>`;
+  }
+}
+
+function deselectZip() {
+  _selZip = null;
+  renderZips();
+  document.getElementById('add-form').classList.add('hidden');
+  document.getElementById('log-section').classList.add('hidden');
+}
+
+// Auto-lowercase ID from name
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('field-name').addEventListener('input', e => {
+    const slug = e.target.value.toLowerCase()
+      .replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '').replace(/_+/g, '_').replace(/^_|_$/g, '');
+    document.getElementById('field-id').value = slug;
+  });
+});
+
+// ── Add asset ─────────────────────────────────────────────────
+async function startAddAsset() {
+  if (!_selZip) return;
+  const name   = document.getElementById('field-name').value.trim();
+  const id     = document.getElementById('field-id').value.trim();
+  const useLlm = document.getElementById('field-llm').checked;
+  const btn    = document.getElementById('btn-add');
+  const icon   = document.getElementById('btn-add-icon');
+  const label  = document.getElementById('btn-add-label');
+  const status = document.getElementById('add-status');
+
+  btn.disabled = true;
+  icon.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px"></span>';
+  label.textContent = 'Başlatılıyor...';
+  status.textContent = '';
+
+  // Show log
+  const logSection = document.getElementById('log-section');
+  const logBox     = document.getElementById('log-box');
+  const badge      = document.getElementById('log-status-badge');
+  logSection.classList.remove('hidden');
+  logBox.textContent = '';
+  badge.className  = 'text-xs px-2 py-0.5 rounded-full bg-yellow-900/60 text-yellow-300';
+  badge.textContent = '⏳ Çalışıyor...';
+  logBox.scrollTop  = logBox.scrollHeight;
+
+  try {
+    const r = await fetch(`${API}/asset-manager/add`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filepath: _selZip.filepath, name, id, use_llm: useLlm }),
+    });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    _jobId = d.job_id;
+    label.textContent = 'İşleniyor...';
+    status.className  = 'text-xs text-yellow-400 flex-1';
+    status.textContent = `Job: ${_jobId}`;
+    _startPolling();
+  } catch (e) {
+    btn.disabled = false;
+    icon.textContent  = '✦';
+    label.textContent = 'Kataloga Ekle';
+    status.className  = 'text-xs text-red-400 flex-1';
+    status.textContent = `❌ ${e.message}`;
+    badge.className  = 'text-xs px-2 py-0.5 rounded-full bg-red-900/60 text-red-300';
+    badge.textContent = '✗ Hata';
+  }
+}
+
+function _startPolling() {
+  if (_pollTimer) clearInterval(_pollTimer);
+  _pollTimer = setInterval(_poll, 800);
+}
+
+async function _poll() {
+  if (!_jobId) return;
+  try {
+    const r = await fetch(`${API}/asset-manager/job/${_jobId}`);
+    const d = await r.json();
+
+    const logBox = document.getElementById('log-box');
+    const badge  = document.getElementById('log-status-badge');
+    const btn    = document.getElementById('btn-add');
+    const icon   = document.getElementById('btn-add-icon');
+    const label  = document.getElementById('btn-add-label');
+    const status = document.getElementById('add-status');
+
+    // Render colorized output
+    logBox.innerHTML = (d.output || '').split('\n').map(line => {
+      if (!line.trim()) return '<span> </span>';
+      if (line.includes('╔') || line.includes('╚') || line.includes('──'))
+        return `<span class="log-head">${escHtml(line)}</span>`;
+      if (line.includes('✓') || line.includes('kataloga eklendi'))
+        return `<span class="log-ok">${escHtml(line)}</span>`;
+      if (line.includes('Hata') || line.includes('Error') || line.includes('error'))
+        return `<span class="log-err">${escHtml(line)}</span>`;
+      if (line.startsWith('  '))
+        return `<span class="log-info">${escHtml(line)}</span>`;
+      return `<span>${escHtml(line)}</span>`;
+    }).join('\n');
+    logBox.scrollTop = logBox.scrollHeight;
+
+    if (d.status === 'done') {
+      clearInterval(_pollTimer);
+      badge.className  = 'text-xs px-2 py-0.5 rounded-full bg-green-900/60 text-green-300';
+      badge.textContent = '✓ Tamamlandı';
+      btn.disabled = false;
+      icon.textContent  = '✓';
+      label.textContent = 'Tekrar Ekle';
+      status.className  = 'text-xs text-green-400 flex-1';
+      status.textContent = 'Kataloga eklendi ✓';
+      loadCatalog();  // refresh catalog list
+    } else if (d.status === 'error') {
+      clearInterval(_pollTimer);
+      badge.className  = 'text-xs px-2 py-0.5 rounded-full bg-red-900/60 text-red-300';
+      badge.textContent = '✗ Hata';
+      btn.disabled = false;
+      icon.textContent  = '✦';
+      label.textContent = 'Tekrar Dene';
+      status.className  = 'text-xs text-red-400 flex-1';
+      status.textContent = d.error || 'Script hatası';
+    }
+  } catch { /* network hiccup — keep polling */ }
+}
+
+// ── Catalog list ───────────────────────────────────────────────
+let _catalogFilter = '';
+
+async function loadCatalog() {
+  document.getElementById('catalog-list').innerHTML =
+    '<p class="text-xs text-gray-600 text-center py-4"><span class="spinner"></span></p>';
+  try {
+    const r = await fetch(`${API}/asset-manager/catalog`);
+    const d = await r.json();
+    _allAssets = d.assets || [];
+    document.getElementById('catalog-count').textContent = `${_allAssets.length} asset`;
+    renderCatalog();
+  } catch (e) {
+    document.getElementById('catalog-list').innerHTML =
+      `<p class="text-xs text-red-400 text-center py-4">❌ ${e.message}</p>`;
+  }
+}
+
+function filterCatalog(q) {
+  _catalogFilter = q.toLowerCase();
+  renderCatalog();
+}
+
+function renderCatalog() {
+  const lo = _catalogFilter;
+  const visible = lo
+    ? _allAssets.filter(a =>
+        (a.id||'').toLowerCase().includes(lo) ||
+        (a.name||'').toLowerCase().includes(lo) ||
+        (a.category||'').toLowerCase().includes(lo))
+    : _allAssets;
+
+  const CAT_COLORS = {
+    seating:'bg-violet-900/50 text-violet-300', tables:'bg-indigo-900/50 text-indigo-300',
+    architecture:'bg-emerald-900/50 text-emerald-300', kitchen:'bg-amber-900/50 text-amber-300',
+  };
+
+  document.getElementById('catalog-list').innerHTML = visible.map(a => {
+    const catCls = CAT_COLORS[a.category] || 'bg-gray-800 text-gray-400';
+    const dim = a.dimensions
+      ? `${a.dimensions.width ?? '?'}×${a.dimensions.depth ?? '?'}×${a.dimensions.height ?? '?'}m`
+      : '';
+    return `<div class="bg-gray-800 rounded-xl px-3 py-2.5 hover:bg-gray-750 transition-colors">
+      <div class="flex items-start justify-between gap-2">
+        <div class="min-w-0">
+          <p class="text-xs font-semibold text-gray-200 truncate">${escHtml(a.name || a.id)}</p>
+          <p class="text-[10px] text-gray-500 font-mono truncate">${escHtml(a.id)}</p>
+        </div>
+        <span class="cat-chip text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${catCls}">${escHtml(a.category || '?')}</span>
+      </div>
+      ${dim ? `<p class="text-[10px] text-gray-600 mt-0.5">${escHtml(dim)}</p>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ── Util ───────────────────────────────────────────────────────
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Init ───────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  checkApi();
+  setInterval(checkApi, 15000);
+  loadZips();
+  loadCatalog();
+});
+</script>
+</body>
+</html>

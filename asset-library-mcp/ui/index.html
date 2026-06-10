@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asset Library — Interior Design AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/ui/css/app.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<!-- HEADER -->
+<header class="bg-indigo-700 text-white px-6 py-4 flex items-center justify-between shadow-lg">
+  <div class="flex items-center gap-3">
+    <span class="text-2xl">🏠</span>
+    <div>
+      <h1 class="text-xl font-bold">Asset Library — Interior Design AI</h1>
+      <p class="text-indigo-200 text-sm">Gemini & Claude çok-ajan iç mimar takımı</p>
+    </div>
+  </div>
+  <div class="flex items-center gap-4 text-sm">
+    <div id="status-blender" class="flex items-center gap-1">
+      <span class="status-dot unk" id="dot-blender"></span>
+      <span id="label-blender">Blender kontrol ediliyor...</span>
+    </div>
+    <div id="status-api" class="flex items-center gap-1">
+      <span class="status-dot unk" id="dot-api"></span>
+      <span id="label-api">API kontrol ediliyor...</span>
+    </div>
+  </div>
+</header>
+
+<!-- TAB NAV -->
+<nav class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-10">
+  <div class="max-w-6xl mx-auto px-4 flex gap-0">
+    <button id="tab-btn-tasarim" onclick="switchTab('tasarim')"
+      class="tab-btn px-5 py-3 text-sm font-medium border-b-2 border-indigo-600 text-indigo-700 transition-colors">
+      🎨 Tasarım
+    </button>
+    <button id="tab-btn-sahne" onclick="switchTab('sahne')"
+      class="tab-btn px-5 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300 transition-colors">
+      📷 Sahne
+    </button>
+    <button id="tab-btn-materyal" onclick="switchTab('materyal')"
+      class="tab-btn px-5 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300 transition-colors">
+      🖼 Materyal
+    </button>
+    <button id="tab-btn-ciz" onclick="switchTab('ciz')"
+      class="tab-btn px-5 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300 transition-colors">
+      ✏️ Oda Çiz
+    </button>
+    <button id="tab-btn-modeller" onclick="switchTab('modeller')"
+      class="tab-btn px-5 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300 transition-colors">
+      🧩 Modeller
+    </button>
+    <button id="tab-btn-sketchfab" onclick="switchTab('sketchfab')"
+      class="tab-btn px-5 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300 transition-colors">
+      🌐 Sketchfab
+    </button>
+    <button id="tab-btn-sistem" onclick="switchTab('sistem')"
+      class="tab-btn px-5 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-800 hover:border-gray-300 transition-colors">
+      ⚙️ Sistem
+    </button>
+  </div>
+</nav>
+
+<main id="tab-tasarim" class="max-w-6xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+  <!-- LEFT COLUMN: Main input + LLM select -->
+  <div class="lg:col-span-2 flex flex-col gap-6">
+
+    <!-- FREE TEXT DESIGN -->
+    <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">🎨 Tasarım İsteği</h2>
+
+      <!-- LLM SELECTOR -->
+      <div class="flex gap-3 mb-4">
+        <button id="btn-gemini" onclick="selectLLM('gemini')"
+          class="llm-btn active flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-indigo-500 text-indigo-700 font-medium text-sm">
+          <img src="https://lh3.googleusercontent.com/qnawW1V9XxMqekJBj2cNWIFST39eoiTUAW1kAcFMJwfIVkQlFh_kRw5LvRiUYnPgjb8" onerror="this.style.display='none'" class="w-5 h-5 rounded" />
+          Gemini 2.5 Flash
+        </button>
+        <button id="btn-claude" onclick="selectLLM('claude')"
+          class="llm-btn flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-gray-300 text-gray-600 font-medium text-sm">
+          <span class="text-orange-500 font-bold text-lg leading-none">✦</span>
+          Claude Sonnet
+        </button>
+      </div>
+
+      <textarea id="prompt-input"
+        class="w-full border border-gray-300 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
+        rows="4"
+        placeholder="Örnek: living room'da office masası ve sandalye istiyorum, 6x4m industrial stil"></textarea>
+
+      <!-- ── Kayıtlı Promptlar ─────────────────────────────────────── -->
+      <div class="mt-3 rounded-xl border border-gray-200 overflow-hidden">
+
+        <!-- Header -->
+        <button onclick="toggleSavedPrompts()"
+          class="w-full flex items-center justify-between px-4 py-2.5 bg-gray-50 hover:bg-gray-100 transition-colors">
+          <div class="flex items-center gap-2">
+            <span class="text-sm">📋</span>
+            <span class="text-xs font-semibold text-gray-700">Kayıtlı Promptlar</span>
+            <span id="sp-count" class="text-[10px] bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded-full font-medium hidden"></span>
+          </div>
+          <span id="sp-arrow" class="text-gray-400 text-xs">▼</span>
+        </button>
+
+        <div id="sp-body" class="hidden border-t border-gray-100">
+
+          <!-- Yeni prompt ekle -->
+          <div class="p-3 bg-white border-b border-gray-100 flex flex-col gap-2">
+            <input id="sp-title" type="text" maxlength="48"
+              placeholder="Başlık (ör: Endüstriyel Ofis 5x4)"
+              class="w-full border border-gray-200 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            <textarea id="sp-content" rows="3"
+              placeholder="Prompt içeriği..."
+              class="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400"></textarea>
+            <button onclick="addSavedPrompt()"
+              class="self-end flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-xs font-medium transition-colors">
+              + Ekle
+            </button>
+          </div>
+
+          <!-- Hazır şablonlar -->
+          <div class="px-3 py-2 bg-amber-50 border-b border-amber-100">
+            <p class="text-[10px] font-semibold text-amber-700 mb-1.5">⚡ Hazır şablonlar — başlığa tıkla, içeriği düzenle, kaydet</p>
+            <div class="flex flex-col gap-1">
+              <button onclick="fillPromptTemplate('sadece-benim-modellerim')"
+                class="text-left text-[11px] text-amber-800 hover:text-amber-600 underline decoration-dotted">
+                Sadece benim modellerim (ekstra ekleme)
+              </button>
+              <button onclick="fillPromptTemplate('ic-mimar')"
+                class="text-left text-[11px] text-amber-800 hover:text-amber-600 underline decoration-dotted">
+                İç mimar yerleşim talimatları
+              </button>
+            </div>
+          </div>
+
+          <!-- Liste -->
+          <div id="sp-list" class="divide-y divide-gray-100 max-h-72 overflow-y-auto"></div>
+          <p id="sp-empty" class="hidden text-center text-xs text-gray-400 py-5">Henüz kayıtlı prompt yok.</p>
+        </div>
+      </div>
+      <!-- ─────────────────────────────────────────────────────────── -->
+
+      <!-- Sketchfab quick-design banner (hidden unless a SF model is selected) -->
+      <div id="sf-design-banner" class="hidden mt-3 rounded-xl border-2 border-sky-400 bg-sky-50 px-4 py-2.5 flex items-center gap-3">
+        <span class="text-lg">🌐</span>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-bold text-sky-800">Sketchfab modeli seçili</p>
+          <p id="sf-design-banner-name" class="text-xs text-sky-700 truncate"></p>
+        </div>
+        <button onclick="clearSfDesignModel()" class="text-sky-400 hover:text-sky-700 text-lg leading-none shrink-0">×</button>
+      </div>
+
+      <!-- Coach feedback (hidden until /coach returns) -->
+      <div id="coach-note" class="hidden mt-3 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-3 text-xs text-indigo-900 leading-relaxed"></div>
+
+      <!-- Sketchfab Recommendations (New Blue Theme Area) -->
+      <div id="sf-coach-recommendations" class="hidden mt-3 rounded-xl border-2 border-blue-400 bg-blue-50 px-4 py-3 shadow-md">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <div class="bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">YENİ</div>
+            <h3 class="text-sm font-black text-blue-900 tracking-tight">Eksik Parçalar: Sketchfab Önerileri</h3>
+          </div>
+          <div id="sf-global-loader" class="flex items-center gap-2 text-[10px] text-blue-500 font-bold">
+            <span class="animate-spin">⏳</span> Arıyor...
+          </div>
+        </div>
+        <div id="sf-recommendations-list" class="space-y-3">
+          <div id="sf-placeholder" class="py-4 text-center text-[10px] text-blue-400 font-medium">
+            Katalogda bulunamayan nesneler için modeller getiriliyor...
+          </div>
+        </div>
+      </div>
+
+      <!-- Material picker shown after coach response -->
+      <div id="coach-mat-picker" class="hidden mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3">
+        <div class="flex items-center justify-between mb-3">
+          <p class="text-xs font-semibold text-amber-800">🎨 Materyal Önerisi</p>
+          <div class="flex items-center gap-0.5 bg-amber-200 rounded-full p-0.5">
+            <button id="coach-mat-mode-preset" onclick="switchCoachMatMode('preset')"
+              class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-white text-amber-800 shadow-sm transition-all">
+              Kayıtlı
+            </button>
+            <button id="coach-mat-mode-file" onclick="switchCoachMatMode('file')"
+              class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-amber-600 transition-all">
+              IMG
+            </button>
+          </div>
+        </div>
+        <div class="space-y-2 mb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-medium text-amber-700 w-14 shrink-0">Zemin:</span>
+            <select id="coach-floor-tex" class="flex-1 border border-amber-300 rounded-lg px-2 py-1 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-amber-400">
+              <option value="">Yok</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-medium text-amber-700 w-14 shrink-0">Duvar:</span>
+            <select id="coach-wall-tex" class="flex-1 border border-amber-300 rounded-lg px-2 py-1 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-amber-400">
+              <option value="">Yok</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="applyCoachMaterials()" id="btn-coach-mat"
+            class="flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 text-white px-4 py-1.5 rounded-lg text-xs font-medium transition-colors">
+            <span id="coach-mat-icon">🎨</span> <span id="coach-mat-label">Uygula</span>
+          </button>
+          <p id="coach-mat-result" class="text-xs text-gray-500 flex-1"></p>
+        </div>
+      </div>
+
+      <!-- Yapboz: SVG plan canvas (hidden until coach-preview returns) -->
+      <div id="plan-canvas-wrap" class="hidden mt-3 rounded-xl border border-emerald-200 bg-white px-4 py-3">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-semibold text-emerald-800">📐 Yapboz — Sürükle · çift tıkla 90° döndür · tıkla düzenle</span>
+          <div class="flex items-center gap-3">
+            <!-- Yapboz kilit toggle — küçük, arka planda -->
+            <div id="yapboz-lock-wrap" class="flex items-center gap-1.5" title="Kilitli: sürükle ✓ · sil ✗ · Prompt Geliştir specs'e dokunamaz">
+              <button id="yapboz-lock-btn" onclick="toggleYapbozLock()"
+                class="relative w-8 h-4 rounded-full transition-colors duration-200 bg-gray-200 focus:outline-none">
+                <span id="yapboz-lock-knob"
+                  class="absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full shadow transition-transform duration-200 transform translate-x-0">
+                </span>
+              </button>
+              <span id="yapboz-lock-label" class="text-[10px] text-gray-400">🔓 Serbest</span>
+            </div>
+            <button onclick="resetPlanOverrides()" class="text-[11px] text-gray-500 hover:text-indigo-700 underline">Sıfırla</button>
+          </div>
+        </div>
+        <svg id="plan-canvas" width="480" height="384"
+             class="block mx-auto border border-gray-300 rounded select-none cursor-default bg-gray-50"></svg>
+        <div id="plan-canvas-note" class="mt-2 text-[11px] text-gray-500 text-center"></div>
+        <!-- Catalog picker: add any asset to the canvas without a prompt -->
+        <div class="flex gap-2 mt-2 pt-2 border-t border-emerald-100 items-center">
+          <select id="yapboz-asset-sel"
+            class="flex-1 text-xs border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-300 bg-white">
+            <option value="">Katalogdan asset seç...</option>
+          </select>
+          <button onclick="loadYapbozCatalog()" title="Kataloğu yenile"
+            class="text-xs text-gray-400 hover:text-emerald-700 px-2 py-1.5 rounded-lg hover:bg-emerald-50 transition-colors border border-gray-200">
+            ↺
+          </button>
+          <button onclick="addCatalogAssetToYapboz()"
+            class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg font-medium whitespace-nowrap transition-colors">
+            + Ekle
+          </button>
+        </div>
+        <!-- Edit panel: shown on single-click of an item -->
+        <div id="yapboz-edit-panel" class="hidden mt-2 pt-2 border-t border-emerald-100">
+          <div class="flex items-center justify-between mb-2">
+            <span id="yep-asset-label" class="text-xs font-semibold text-gray-700">—</span>
+            <button onclick="deselectYapbozItem()"
+              class="text-[11px] text-gray-400 hover:text-gray-600">✕ Kapat</button>
+          </div>
+          <!-- Surface relationship -->
+          <div class="mb-2">
+            <label class="block text-[11px] text-gray-500 mb-0.5">Üzerinde duruyor</label>
+            <select id="yep-surface" onchange="updateYapbozSurface()"
+              class="w-full border border-gray-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-amber-400 bg-white">
+              <option value="">Zemin (varsayılan)</option>
+            </select>
+            <p class="text-[10px] text-gray-400 mt-0.5">Masa lambası → masanın üstü; kitap → raf üstü vb.</p>
+          </div>
+          <div class="grid grid-cols-2 gap-x-3 gap-y-1.5">
+            <div>
+              <label class="block text-[11px] text-gray-500 mb-0.5">Rotasyon (°)</label>
+              <input id="yep-rot" type="number" step="90" min="0" max="270" value="0"
+                onchange="updateYapbozRotation()"
+                class="w-full border border-gray-200 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-emerald-400" />
+            </div>
+            <!-- Compass: "sıfır rotasyonda ön yüz nereye bakıyor?" -->
+            <div>
+              <label class="block text-[11px] text-gray-500 mb-1">
+                Sıfır rotasyonda ön yüz?
+                <span class="text-gray-400 font-normal">tıkla → anında kaydet</span>
+              </label>
+              <div class="grid grid-cols-3 gap-0.5 w-24">
+                <div></div>
+                <button data-correction="0" onclick="applyFacingCorrection(0)"
+                  class="yep-dir text-center text-[11px] py-0.5 rounded border border-gray-200 hover:bg-amber-100 hover:border-amber-400 transition-colors leading-tight">
+                  ↑<br><span class="text-[9px] text-gray-400">K(+Y)</span>
+                </button>
+                <div></div>
+                <button data-correction="90" onclick="applyFacingCorrection(90)"
+                  class="yep-dir text-center text-[11px] py-0.5 rounded border border-gray-200 hover:bg-amber-100 hover:border-amber-400 transition-colors leading-tight">
+                  ←<br><span class="text-[9px] text-gray-400">B(−X)</span>
+                </button>
+                <div class="flex items-center justify-center text-[9px] text-gray-400 border border-gray-200 rounded bg-gray-50">M</div>
+                <button data-correction="270" onclick="applyFacingCorrection(270)"
+                  class="yep-dir text-center text-[11px] py-0.5 rounded border border-gray-200 hover:bg-amber-100 hover:border-amber-400 transition-colors leading-tight">
+                  →<br><span class="text-[9px] text-gray-400">D(+X)</span>
+                </button>
+                <div></div>
+                <button data-correction="180" onclick="applyFacingCorrection(180)"
+                  class="yep-dir text-center text-[11px] py-0.5 rounded border border-gray-200 hover:bg-amber-100 hover:border-amber-400 transition-colors leading-tight">
+                  ↓<br><span class="text-[9px] text-gray-400">G(−Y)</span>
+                </button>
+                <div></div>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between mt-2">
+            <p id="yep-save-msg" class="text-[11px] hidden rounded px-2 py-0.5"></p>
+            <button onclick="removeFromYapboz()"
+              class="ml-auto text-[11px] text-red-500 hover:text-red-700 hover:bg-red-50 px-2 py-0.5 rounded transition-colors">
+              ✕ Yapbozdan Kaldır
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sketchfab Mode Toggle -->
+      <div id="sf-toggle-wrap" class="flex items-center gap-2 mt-3 px-3 py-2 rounded-xl border transition-all duration-200
+             border-gray-200 bg-gray-50" title="Sketchfab modu açıkken katalogda olmayan modeller Sketchfab'dan aranır ve indirilir">
+        <button id="sf-toggle-btn" onclick="toggleSfMode()"
+          class="relative flex-shrink-0 w-10 h-5 rounded-full transition-colors duration-200 focus:outline-none bg-gray-300"
+          aria-pressed="false">
+          <span id="sf-toggle-knob"
+            class="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform duration-200 transform translate-x-0">
+          </span>
+        </button>
+        <div class="flex flex-col leading-tight min-w-0">
+          <span id="sf-toggle-label" class="text-xs font-semibold text-gray-500">Sadece Katalog</span>
+          <span id="sf-toggle-sub" class="text-[10px] text-gray-400 truncate">Sketchfab kapalı</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 mt-3">
+        <button onclick="refinePrompt()" id="btn-coach"
+          class="flex items-center gap-2 bg-white hover:bg-indigo-50 border-2 border-indigo-500 text-indigo-700 px-4 py-2.5 rounded-xl font-medium text-sm transition-colors">
+          <span id="coach-icon">✨</span>
+          <span id="coach-label">Prompt Geliştir</span>
+        </button>
+        <button onclick="submitDesign()" id="btn-design"
+          class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-medium text-sm transition-colors">
+          <span id="btn-icon">⚡</span>
+          <span id="btn-label">Tasarla</span>
+        </button>
+        <button onclick="clearResponse()"
+          class="text-gray-500 hover:text-gray-700 text-sm px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors">
+          Temizle
+        </button>
+        <button onclick="openYapbozManual()"
+          class="text-gray-500 hover:text-emerald-700 text-sm px-3 py-2 rounded-lg hover:bg-emerald-50 transition-colors">
+          📐 Yapboz Aç
+        </button>
+        <span id="llm-indicator" class="ml-auto text-xs text-gray-400">Gemini kullanılıyor</span>
+      </div>
+    </section>
+
+    <!-- RESPONSE -->
+    <section id="response-section" class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 hidden">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-semibold text-gray-800">📋 Ajan Cevabı</h2>
+        <div id="loading-spinner" class="spinner hidden"></div>
+      </div>
+      <div id="response-box"
+        class="bg-gray-50 rounded-xl p-4 text-sm text-gray-700 min-h-32 max-h-[500px] overflow-y-auto leading-relaxed">
+      </div>
+    </section>
+
+    <!-- HOUSE MODEL DESIGN -->
+    <section class="bg-white rounded-2xl shadow-sm border border-indigo-200 p-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">🏡 Ev Modeli Tasarımı</h2>
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-gray-600 mb-1">Ev Modeli</label>
+          <select id="house-sel" onchange="loadHouseRooms()" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            <option value="">API bağlanınca yüklenir...</option>
+          </select>
+        </div>
+        <div class="col-span-2">
+          <label class="block text-xs font-medium text-gray-600 mb-1">Oda</label>
+          <select id="room-sel" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            <option value="">Önce ev seçin</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Stil</label>
+          <select id="house-style" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            <option value="">Stil yok</option>
+            <option value="industrial">Industrial</option>
+            <option value="classic">Klasik</option>
+            <option value="mid-century">Mid-Century</option>
+            <option value="modern">Modern</option>
+            <option value="minimalist">Minimalist</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Ekstra istek</label>
+          <input id="house-extra" type="text" placeholder="masa ve sandalye ekle..."
+            class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+        </div>
+      </div>
+
+      <!-- 3D CURSOR SECTION -->
+      <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-3 mb-4">
+        <p class="text-xs font-semibold text-indigo-800 mb-2">📍 Oda Konumunu Ölç (3D Cursor)</p>
+        <p class="text-xs text-indigo-700 mb-2">Blender'da: Shift+Sağ Tık → oda merkezine cursor koy → "Cursor Oku" bas</p>
+        <div class="flex gap-2">
+          <button onclick="readCursor()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
+            Cursor Oku
+          </button>
+          <code id="cursor-result" class="flex-1 bg-white border border-indigo-200 rounded-lg px-3 py-1.5 text-xs text-gray-600 font-mono">
+            [x, y, z]
+          </code>
+          <button onclick="saveCursorAsRoomOrigin()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
+            Kaydet
+          </button>
+        </div>
+        <div id="cursor-save-result" class="mt-2 text-xs hidden"></div>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="buildHousePrompt()"
+          class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl text-sm font-medium transition-colors">
+          Prompt Üret
+        </button>
+        <button onclick="buildHouseAndSubmit()"
+          class="flex-1 bg-indigo-400 hover:bg-indigo-500 text-white py-2 rounded-xl text-sm font-medium transition-colors">
+          AI ile Tasarla
+        </button>
+      </div>
+      <button onclick="designHouseRoom()"
+        class="w-full mt-2 bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-xl text-sm font-bold transition-colors">
+        ⚡ Direkt Tasarla (Deterministik)
+      </button>
+    </section>
+
+    <!-- VISUAL BUILDER -->
+    <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">🛋️ Görsel Seçici → Prompt Üret</h2>
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Oda Tipi</label>
+          <select id="sel-room" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            <option value="living_room">Oturma Odası</option>
+            <option value="office">Ofis</option>
+            <option value="bedroom">Yatak Odası</option>
+            <option value="dining_room">Yemek Odası</option>
+            <option value="kitchen">Mutfak</option>
+            <option value="bathroom">Banyo</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Stil</label>
+          <select id="sel-style" class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300">
+            <option value="">Stil seçme (hepsi)</option>
+            <option value="industrial">Industrial</option>
+            <option value="classic">Klasik</option>
+            <option value="mid-century">Mid-Century</option>
+            <option value="modern">Modern</option>
+            <option value="minimalist">Minimalist</option>
+            <option value="vintage">Vintage</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Genişlik (m)</label>
+          <input id="sel-width" type="number" value="5" min="2" max="20" step="0.5"
+            class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Derinlik (m)</label>
+          <input id="sel-depth" type="number" value="4" min="2" max="20" step="0.5"
+            class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 mb-1">Yükseklik (m)</label>
+          <input id="sel-height" type="number" value="2.7" min="2" max="5" step="0.1"
+            class="w-full border border-gray-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+        </div>
+      </div>
+
+      <!-- CUSTOM FURNITURE LIST -->
+      <div class="mb-4">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-xs font-medium text-gray-600">Özel Mobilya Ekle (opsiyonel)</label>
+          <button onclick="addFurnitureRow()" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">+ Mobilya Ekle</button>
+        </div>
+        <div id="furniture-list" class="flex flex-col gap-2"></div>
+      </div>
+
+      <div class="flex gap-2">
+        <button onclick="buildPrompt()"
+          class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl text-sm font-medium transition-colors">
+          Prompt Üret
+        </button>
+        <button onclick="buildAndSubmit()"
+          class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-xl text-sm font-medium transition-colors">
+          Üret + Tasarla
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!-- RIGHT COLUMN: Quick examples -->
+  <div class="flex flex-col gap-4">
+    <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+      <h2 class="text-base font-semibold text-gray-800 mb-4">⚡ Hazır Örnekler</h2>
+      <div class="flex flex-col gap-3">
+
+        <div class="card-example cursor-pointer bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-xl p-4"
+          onclick="useExample(this)">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-semibold text-blue-700 uppercase tracking-wide">Industrial Office</span>
+            <button onclick="copyPrompt(this, event)" class="text-blue-500 hover:text-blue-700 text-xs">Kopyala</button>
+          </div>
+          <p class="text-sm text-gray-700 prompt-text">5x4m industrial tarzda ofis, masa ve sandalye istiyorum</p>
+        </div>
+
+        <div class="card-example cursor-pointer bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl p-4"
+          onclick="useExample(this)">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-semibold text-amber-700 uppercase tracking-wide">Living Room + Desk</span>
+            <button onclick="copyPrompt(this, event)" class="text-amber-500 hover:text-amber-700 text-xs">Kopyala</button>
+          </div>
+          <p class="text-sm text-gray-700 prompt-text">6x4m living room, kuzey duvara office masası ve masanın önüne armchair ekle, classic stil</p>
+        </div>
+
+        <div class="card-example cursor-pointer bg-green-50 hover:bg-green-100 border border-green-200 rounded-xl p-4"
+          onclick="useExample(this)">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-semibold text-green-700 uppercase tracking-wide">Klasik Oturma Odası</span>
+            <button onclick="copyPrompt(this, event)" class="text-green-500 hover:text-green-700 text-xs">Kopyala</button>
+          </div>
+          <p class="text-sm text-gray-700 prompt-text">5x4m klasik tarzda oturma odası tasarla, koltuk ve sehpa olsun</p>
+        </div>
+
+        <div class="card-example cursor-pointer bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-xl p-4"
+          onclick="useExample(this)">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-semibold text-purple-700 uppercase tracking-wide">Mid-Century Yatak Odası</span>
+            <button onclick="copyPrompt(this, event)" class="text-purple-500 hover:text-purple-700 text-xs">Kopyala</button>
+          </div>
+          <p class="text-sm text-gray-700 prompt-text">4x4m mid-century yatak odası, 2.8m tavan yüksekliği</p>
+        </div>
+
+        <div class="card-example cursor-pointer bg-rose-50 hover:bg-rose-100 border border-rose-200 rounded-xl p-4"
+          onclick="useExample(this)">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-semibold text-rose-700 uppercase tracking-wide">Sahne Durumu</span>
+            <button onclick="copyPrompt(this, event)" class="text-rose-500 hover:text-rose-700 text-xs">Kopyala</button>
+          </div>
+          <p class="text-sm text-gray-700 prompt-text">Blender'daki sahnede şu an ne var? Tüm nesneleri listele.</p>
+        </div>
+
+        <div class="card-example cursor-pointer bg-teal-50 hover:bg-teal-100 border border-teal-200 rounded-xl p-4"
+          onclick="useExample(this)">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xs font-semibold text-teal-700 uppercase tracking-wide">Katalog Arama</span>
+            <button onclick="copyPrompt(this, event)" class="text-teal-500 hover:text-teal-700 text-xs">Kopyala</button>
+          </div>
+          <p class="text-sm text-gray-700 prompt-text">Katalogda hangi mobilyalar var? Industrial stilinde ne bulunuyor?</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CALIBRATION -->
+    <section class="bg-white rounded-2xl shadow-sm border border-amber-200 p-5">
+      <h2 class="text-base font-semibold text-gray-800 mb-3">🧭 Yön & Dönüş Kalibrasyonu</h2>
+      <p class="text-xs text-gray-500 mb-3">Model yan/ters geliyorsa burada düzelt.</p>
+
+      <div class="mb-3">
+        <label class="block text-xs font-medium text-gray-600 mb-1">Asset Seç</label>
+        <select id="cal-asset" class="w-full border border-gray-300 rounded-lg p-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-300">
+          <option value="">Yükleniyor...</option>
+        </select>
+      </div>
+
+      <button onclick="testFacing()"
+        class="w-full bg-amber-500 hover:bg-amber-600 text-white py-2 rounded-lg text-xs font-medium mb-3 transition-colors">
+        Blender'da Test İçe Aktar
+      </button>
+
+      <!-- Rotation Correction (X/Y eksen düzeltmesi — yan geliyor sorunu) -->
+      <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-3">
+        <p class="text-xs font-semibold text-red-700 mb-2">📐 Model Yan/Ters Geliyor? — Eksen Düzelt</p>
+        <p class="text-[11px] text-red-600 mb-2">Model dik durması gerekirken yatıyorsa aşağıdan seç:</p>
+        <div class="grid grid-cols-2 gap-1.5 mb-2">
+          <button onclick="applyRotPreset(90,0,0)"
+            class="rot-preset-btn text-[11px] py-1.5 px-2 rounded border border-red-200 hover:bg-red-100 bg-white transition-colors text-red-700">
+            🔄 X+90° — sırt üstü yatıyor
+          </button>
+          <button onclick="applyRotPreset(-90,0,0)"
+            class="rot-preset-btn text-[11px] py-1.5 px-2 rounded border border-red-200 hover:bg-red-100 bg-white transition-colors text-red-700">
+            🔄 X−90° — yüz üstü yatıyor
+          </button>
+          <button onclick="applyRotPreset(0,90,0)"
+            class="rot-preset-btn text-[11px] py-1.5 px-2 rounded border border-red-200 hover:bg-red-100 bg-white transition-colors text-red-700">
+            🔄 Y+90° — sağa yatıyor
+          </button>
+          <button onclick="applyRotPreset(0,-90,0)"
+            class="rot-preset-btn text-[11px] py-1.5 px-2 rounded border border-red-200 hover:bg-red-100 bg-white transition-colors text-red-700">
+            🔄 Y−90° — sola yatıyor
+          </button>
+          <button onclick="applyRotPreset(0,0,0)"
+            class="rot-preset-btn col-span-2 text-[11px] py-1.5 px-2 rounded border border-gray-200 hover:bg-gray-50 bg-white transition-colors text-gray-600">
+            ✓ Sıfırla (0,0,0) — düz duruyor
+          </button>
+        </div>
+        <div class="grid grid-cols-3 gap-1.5 text-xs">
+          <div>
+            <label class="block text-gray-500 mb-0.5">RX (°)</label>
+            <input id="cal-rx" type="number" value="0" step="90"
+              class="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-red-400" />
+          </div>
+          <div>
+            <label class="block text-gray-500 mb-0.5">RY (°)</label>
+            <input id="cal-ry" type="number" value="0" step="90"
+              class="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-red-400" />
+          </div>
+          <div>
+            <label class="block text-gray-500 mb-0.5">RZ extra (°)</label>
+            <input id="cal-rz" type="number" value="0" step="90"
+              class="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-red-400" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Facing direction (Z rotation) -->
+      <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800 mb-3">
+        <p class="font-semibold mb-1">🧭 Ön Yüz Yönü (Z rotasyonu)</p>
+        <p>Model dik duruyor ama yanlış yöne bakıyor:</p>
+        <p class="mt-1">−Y'e (sana doğru) → 0 &nbsp;|&nbsp; +Y'e → 180</p>
+        <p>+X'e → 270 &nbsp;|&nbsp; −X'e → 90</p>
+      </div>
+
+      <div class="flex gap-2 items-center mb-3">
+        <label class="text-xs text-gray-600 whitespace-nowrap">Facing Z (°):</label>
+        <input id="cal-correction" type="number" value="0" step="90" min="0" max="270"
+          class="flex-1 border border-gray-300 rounded-lg p-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-300" />
+      </div>
+
+      <button onclick="saveAllCorrections()"
+        class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg text-xs font-medium transition-colors">
+        💾 Tüm Düzeltmeleri Kaydet
+      </button>
+
+      <div id="cal-result" class="mt-2 text-xs hidden"></div>
+    </section>
+
+    <!-- API INFO -->
+    <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+      <h2 class="text-base font-semibold text-gray-800 mb-3">ℹ️ Kurulum</h2>
+      <div class="text-xs text-gray-600 space-y-2">
+        <div class="bg-gray-100 rounded-lg p-3 font-mono">
+          <p class="text-gray-500"># 1. Bağımlılıkları kur</p>
+          <p>pip install -e .</p>
+          <p class="mt-2 text-gray-500"># 2. .env'e API key ekle</p>
+          <p>GOOGLE_API_KEY=AIza...</p>
+          <p>ANTHROPIC_API_KEY=sk-ant-...</p>
+          <p class="mt-2 text-gray-500"># 3. Sunucuyu başlat</p>
+          <p>python run_team.py --serve</p>
+        </div>
+        <p>Blender'da: <strong>N paneli → Asset Library → Start Server</strong></p>
+        <div id="api-url" class="mt-2 text-indigo-600 font-medium text-xs">API: http://localhost:8080</div>
+      </div>
+    </section>
+  </div>
+
+</main>
+
+<!-- SAHNE TAB -->
+<div id="tab-sahne" class="hidden max-w-6xl mx-auto px-4 py-6">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-800">📷 Blender Sahnesi</h2>
+        <p class="text-xs text-gray-500 mt-0.5">Blender'daki nesneleri üstten görüntüle — yerleşimi ve boyutları kontrol et</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btn-scene-select" onclick="toggleSceneSelectMode()"
+          class="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-3 py-2 rounded-xl text-sm font-medium transition-colors">
+          🖱 Seç
+        </button>
+        <button id="btn-scene-delete" onclick="toggleSceneDeleteMode()"
+          class="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-xl text-sm font-medium transition-colors">
+          🗑 Sil
+        </button>
+        <button id="btn-scene-sel" onclick="toggleSceneSelMode()"
+          class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-sm font-medium transition-colors">
+          📐 Alan Çiz
+        </button>
+        <button onclick="loadBlenderScene()"
+          class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">
+          <span id="scene-refresh-icon">↺</span>
+          <span id="scene-refresh-label">Sahneyi Tazele</span>
+        </button>
+      </div>
+    </div>
+    <div id="scene-status" class="text-xs text-gray-500 mb-3 h-4"></div>
+    <p id="scene-sel-hint" class="hidden text-xs text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-1.5 mb-2">
+      📐 Canvas üzerinde tıklayıp sürükleyerek alan seçin
+    </p>
+    <p id="scene-select-hint" class="hidden text-xs text-sky-700 bg-sky-50 border border-sky-200 rounded-lg px-3 py-1.5 mb-2">
+      🖱 Bir nesneye tıklayarak seçin — ardından prompt ile değiştirin
+    </p>
+    <p id="scene-delete-hint" class="hidden text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-1.5 mb-2">
+      🗑 Bir nesneye tıklayarak Blender sahnesinden silin
+    </p>
+    <svg id="scene-canvas" width="720" height="540"
+         class="block mx-auto border border-gray-300 rounded bg-gray-50 select-none">
+      <text x="360" y="280" text-anchor="middle" fill="#94a3b8" font-size="14">
+        Sahneyi görmek için "Sahneyi Tazele" butonuna bas
+      </text>
+    </svg>
+    <div id="scene-legend" class="mt-3 flex flex-wrap gap-3 text-xs text-gray-600 justify-center min-h-5"></div>
+
+    <!-- ── Pencere Görünümleri ─────────────────────────────────── -->
+    <div id="window-views-panel" class="mt-4 bg-slate-800 border border-slate-700 rounded-xl p-4">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">🪟</span>
+          <p class="text-sm font-semibold text-slate-100">Pencere Görünümleri</p>
+        </div>
+        <button onclick="refreshWindowWalls()"
+          class="text-xs text-slate-400 hover:text-slate-100 flex items-center gap-1 transition-colors">
+          ↺ Yenile
+        </button>
+      </div>
+
+      <div class="mb-3">
+        <p class="text-[10px] text-slate-500 mb-1.5 uppercase tracking-wide">Duvar Seç
+          <span class="text-slate-600 normal-case">(boşsa tümüne üretir)</span>
+        </p>
+        <div id="window-walls-chips" class="flex flex-wrap gap-1.5">
+          <span class="text-xs text-slate-500">Sahneyi tazele → duvarlar görünür</span>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="text-xs text-slate-400 mb-1 block">Atmosfer:</label>
+        <textarea id="window-atmosphere" rows="2"
+          class="w-full bg-slate-700 border border-slate-600 text-slate-100 text-xs rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-violet-500 placeholder-slate-500 resize-none"
+          placeholder="rainy night city with neon lights, tokyo street view..."></textarea>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="generateWindowViews()"
+          id="btn-gen-window-views"
+          class="flex items-center gap-2 bg-violet-600 hover:bg-violet-700 text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors">
+          <span id="wv-gen-icon">✦</span>
+          <span id="wv-gen-label">Üret ve Uygula</span>
+        </button>
+        <span id="window-views-status" class="text-xs text-slate-400 flex-1"></span>
+      </div>
+
+      <div id="window-views-progress" class="mt-3 space-y-1 hidden"></div>
+
+      <div class="mt-4 border-t border-slate-700 pt-3">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs text-slate-400 font-medium">Geçmiş Görseller</span>
+          <button onclick="loadWindowViewsCatalog()"
+            class="text-xs text-slate-500 hover:text-slate-200 transition-colors">↺ Yenile</button>
+        </div>
+
+        <div class="flex items-center gap-2 mb-3">
+          <label class="text-xs text-slate-500 whitespace-nowrap">Hangi duvara:</label>
+          <select id="window-apply-target"
+            class="flex-1 bg-slate-700 border border-slate-600 text-slate-200 text-xs rounded-lg px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-violet-500">
+            <option value="">— duvar seçin —</option>
+          </select>
+        </div>
+
+        <div id="window-views-catalog" class="text-xs text-slate-500">
+          Henüz üretilmiş görsel yok.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Dış Görünüm / HDRI World ─────────────────────────────── -->
+    <div class="mt-4 bg-slate-800 border border-slate-700 rounded-xl p-4">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">🌆</span>
+          <p class="text-sm font-semibold text-slate-100">Dış Görünüm (HDRI Dünya)</p>
+        </div>
+        <span class="text-xs text-slate-400">polyhaven.com → .hdr / .exr</span>
+      </div>
+      <div class="flex gap-2 mb-2">
+        <input id="hdri-path-input" type="text"
+          class="flex-1 bg-slate-700 border border-slate-600 text-slate-100 text-xs rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 placeholder-slate-500"
+          placeholder="C:\Users\...\city_night.hdr" />
+        <input id="hdri-rotation" type="number" value="0" min="-360" max="360" step="15"
+          class="w-20 bg-slate-700 border border-slate-600 text-slate-100 text-xs rounded-lg px-2 py-2 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          title="Rotasyon (derece)" />
+        <input id="hdri-strength" type="number" value="1.0" min="0.1" max="5" step="0.1"
+          class="w-20 bg-slate-700 border border-slate-600 text-slate-100 text-xs rounded-lg px-2 py-2 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          title="Parlaklık" />
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="applyHdri()"
+          class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium px-4 py-2 rounded-lg transition-colors">
+          ✦ Uygula
+        </button>
+        <label class="flex items-center gap-2 cursor-pointer select-none">
+          <input type="checkbox" id="hdri-auto-apply" class="rounded" checked />
+          <span class="text-xs text-slate-300">Pencere eklerken otomatik uygula</span>
+        </label>
+        <span id="hdri-result" class="text-xs text-slate-400"></span>
+      </div>
+      <p class="text-xs text-slate-500 mt-2">Görmek için: Blender → Z → <strong class="text-slate-300">Material Preview</strong> veya <strong class="text-slate-300">Rendered</strong></p>
+    </div>
+
+    <!-- Object select/modify panel (shown when an object is selected) -->
+    <div id="scene-select-panel" class="hidden mt-3 bg-sky-50 border border-sky-200 rounded-xl p-4">
+      <div class="flex items-start justify-between mb-3">
+        <div>
+          <p class="text-sm font-semibold text-sky-800">Seçili: <span id="scene-obj-name">—</span></p>
+          <p class="text-xs text-sky-600 mt-0.5">Prompt ile değiştir veya sil</p>
+        </div>
+        <button onclick="clearSceneSelectPanel()" class="text-sky-400 hover:text-sky-700 text-sm leading-none mt-0.5">✕</button>
+      </div>
+      <div class="flex gap-2 mb-3">
+        <button id="scene-llm-gemini" onclick="selectSceneLLM('gemini')"
+          class="scene-llm-btn active flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-sky-500 text-sky-700 font-medium text-xs">
+          <img src="https://lh3.googleusercontent.com/qnawW1V9XxMqekJBj2cNWIFST39eoiTUAW1kAcFMJwfIVkQlFh_kRw5LvRiUYnPgjb8" onerror="this.style.display='none'" class="w-4 h-4 rounded" />
+          Gemini
+        </button>
+        <button id="scene-llm-claude" onclick="selectSceneLLM('claude')"
+          class="scene-llm-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-gray-300 text-gray-500 font-medium text-xs">
+          <span class="text-orange-500 font-bold leading-none">✦</span>
+          Claude
+        </button>
+      </div>
+      <div class="flex items-center gap-2 mb-3 flex-wrap">
+        <span class="text-xs font-medium text-sky-700">Yön:</span>
+        <button onclick="rotateSceneGroup(-90)"
+          class="px-2.5 py-1 bg-white border border-sky-300 hover:border-sky-500 hover:bg-sky-50 rounded-lg text-sm font-medium text-sky-700 transition-colors">−90°</button>
+        <button onclick="rotateSceneGroup(90)"
+          class="px-2.5 py-1 bg-white border border-sky-300 hover:border-sky-500 hover:bg-sky-50 rounded-lg text-sm font-medium text-sky-700 transition-colors">+90°</button>
+        <button onclick="rotateSceneGroup(180)"
+          class="px-2.5 py-1 bg-white border border-sky-300 hover:border-sky-500 hover:bg-sky-50 rounded-lg text-sm font-medium text-sky-700 transition-colors">180°</button>
+        <input id="scene-rot-deg" type="number" value="45" step="1" min="-360" max="360"
+          class="w-16 border border-sky-300 rounded-lg px-2 py-1 text-sm text-center focus:outline-none focus:ring-2 focus:ring-sky-400 bg-white" />
+        <button onclick="rotateSceneGroupCustom()"
+          class="px-3 py-1 bg-sky-500 hover:bg-sky-600 text-white rounded-lg text-sm font-medium transition-colors">↻</button>
+        <span id="scene-rot-status" class="text-xs text-sky-600 ml-1"></span>
+      </div>
+      <div class="mb-2">
+        <div class="flex items-center gap-2 mb-1.5">
+          <select id="scene-saved-set-sel"
+            class="flex-1 border border-amber-300 rounded-lg px-2 py-1.5 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-amber-400">
+            <option value="">— Son kayıt —</option>
+          </select>
+          <button onclick="loadSavedSetForScene()"
+            class="px-2.5 py-1.5 bg-amber-400 hover:bg-amber-500 text-white rounded-lg text-xs font-medium transition-colors whitespace-nowrap">Seç</button>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="applyLastMaterialToGroup()"
+            class="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-xl text-sm font-medium transition-colors">
+            🎨 Materyal Uygula
+          </button>
+          <p id="scene-mat-result" class="text-xs text-gray-500 flex-1"></p>
+        </div>
+      </div>
+      <textarea id="scene-obj-prompt" rows="2"
+        class="w-full border border-sky-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 resize-none mb-3 bg-white"
+        placeholder="Ne yapmak istiyorsun? Örnek: kırmızıya boya, 0.5m yukarı taşı, 2 kat büyüt..."></textarea>
+      <div class="flex items-center gap-3 flex-wrap">
+        <button onclick="applyObjectChange()" id="btn-apply-change"
+          class="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-5 py-2 rounded-xl text-sm font-medium transition-colors">
+          <span id="apply-icon">✨</span> <span id="apply-label">Uygula</span>
+        </button>
+        <button onclick="deleteSelectedGroup()"
+          class="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors">
+          🗑 Sil
+        </button>
+        <p id="apply-result" class="text-xs text-gray-500 flex-1"></p>
+      </div>
+    </div>
+    <!-- Area generate panel (shown after user draws a selection) -->
+    <div id="scene-gen-panel" class="hidden mt-3 bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+      <div class="flex items-start justify-between mb-3">
+        <div>
+          <p class="text-sm font-semibold text-emerald-800">Alan seçildi — AI ile model üret</p>
+          <p id="scene-sel-info" class="text-xs text-emerald-700 mt-0.5"></p>
+        </div>
+        <button onclick="clearSceneSelection()" class="text-emerald-500 hover:text-emerald-800 text-sm leading-none mt-0.5">✕</button>
+      </div>
+      <div class="flex gap-2 mb-3">
+        <button id="gen-llm-gemini" onclick="selectGenLLM('gemini')"
+          class="gen-llm-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-emerald-500 text-emerald-700 font-medium text-xs">
+          <img src="https://lh3.googleusercontent.com/qnawW1V9XxMqekJBj2cNWIFST39eoiTUAW1kAcFMJwfIVkQlFh_kRw5LvRiUYnPgjb8" onerror="this.style.display='none'" class="w-4 h-4 rounded" />
+          Gemini
+        </button>
+        <button id="gen-llm-claude" onclick="selectGenLLM('claude')"
+          class="gen-llm-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-gray-300 text-gray-500 font-medium text-xs">
+          <span class="text-orange-500 font-bold leading-none">✦</span>
+          Claude
+        </button>
+      </div>
+      <textarea id="scene-gen-prompt" rows="2"
+        class="w-full border border-emerald-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none mb-3 bg-white"
+        placeholder="Ne üretmek istiyorsunuz? Örnek: modern endüstriyel raf, ahşap kütüphane, minimalist sehpa..."></textarea>
+      <div class="flex items-center gap-3">
+        <button onclick="generateInArea()" id="btn-gen"
+          class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-sm font-medium transition-colors">
+          <span id="gen-icon">✨</span> <span id="gen-label">Üret</span>
+        </button>
+        <p id="gen-result" class="text-xs text-gray-500"></p>
+      </div>
+    </div>
+    <div id="scene-analysis" class="hidden mt-4 bg-indigo-50 border border-indigo-200 rounded-xl px-4 py-3 text-sm text-indigo-900 leading-relaxed"></div>
+    <div id="scene-groups" class="mt-3 space-y-2"></div>
+  </div>
+</div>
+
+<!-- MATERYAL TAB -->
+<div id="tab-materyal" class="hidden max-w-4xl mx-auto px-4 py-6">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+    <div class="mb-5">
+      <h2 class="text-lg font-semibold text-gray-800">🎨 Materyal Yönetimi</h2>
+      <p class="text-xs text-gray-500 mt-0.5">Dosyadan texture seç veya AI ile prosedürel materyal üret — ardından sahnedeki objeye uygula</p>
+    </div>
+
+    <!-- Dosyadan Seç -->
+    <div class="mb-5 p-4 bg-gray-50 border border-gray-200 rounded-xl">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-semibold text-gray-700">📁 Dosyadan Seç</h3>
+        <button onclick="loadTextureList()"
+          class="px-2.5 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg text-xs font-medium transition-colors">↺ Yenile</button>
+      </div>
+      <div class="flex gap-1 mb-4 bg-gray-200 rounded-lg p-0.5 w-fit">
+        <button id="mat-mode-quick" onclick="setMatFileMode('quick')"
+          class="px-4 py-1.5 rounded-md text-xs font-semibold bg-white text-gray-800 shadow-sm transition-all">
+          Hızlı (Diff)
+        </button>
+        <button id="mat-mode-pbr" onclick="setMatFileMode('pbr')"
+          class="px-4 py-1.5 rounded-md text-xs font-semibold text-gray-500 transition-all">
+          Tam PBR
+        </button>
+      </div>
+
+      <div id="mat-quick-section">
+        <p class="text-xs text-gray-500 mb-2">Tek dosya → Base Color kanalına bağlanır (<code>_diff</code> dosyasını seçin)</p>
+        <select id="mat-texture-select" onchange="selectTextureMaterial(this.value)"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white mb-3">
+          <option value="">-- Texture seçin --</option>
+        </select>
+        <button onclick="saveFileMaterial()"
+          class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors">
+          ✓ Hızlı Materyali Kaydet
+        </button>
+      </div>
+
+      <div id="mat-pbr-section" class="hidden">
+        <p class="text-xs text-gray-500 mb-3">Her haritayı ayrı seçin (Roughness ve Normal opsiyonel)</p>
+        <div class="space-y-2 mb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-medium text-gray-600 w-24 shrink-0">Base Color <span class="text-red-500">*</span></span>
+            <select id="mat-pbr-diff"
+              class="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white">
+              <option value="">-- diff/albedo --</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-medium text-gray-600 w-24 shrink-0">Roughness</span>
+            <select id="mat-pbr-rough"
+              class="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white">
+              <option value="">-- rough --</option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-medium text-gray-600 w-24 shrink-0">Normal</span>
+            <select id="mat-pbr-normal"
+              class="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400 bg-white">
+              <option value="">-- nor_gl --</option>
+            </select>
+          </div>
+        </div>
+        <button onclick="savePBRMaterial()"
+          class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors">
+          ✓ PBR Seti Kaydet
+        </button>
+      </div>
+
+      <div class="mt-4 pt-3 border-t border-gray-200">
+        <p class="text-xs font-semibold text-gray-600 mb-2">💾 Kayıtlı Setler</p>
+        <div id="mat-saved-list" class="space-y-1.5">
+          <p class="text-xs text-gray-400 italic">Henüz kayıtlı set yok</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI ile Üret -->
+    <div class="mb-5 p-4 bg-purple-50 border border-purple-200 rounded-xl">
+      <h3 class="text-sm font-semibold text-purple-800 mb-3">✨ AI ile Üret</h3>
+      <div class="flex gap-2 mb-3">
+        <button id="mat-llm-gemini" onclick="selectMatLLM('gemini')"
+          class="mat-llm-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-purple-500 text-purple-700 font-medium text-xs">
+          <img src="https://lh3.googleusercontent.com/qnawW1V9XxMqekJBj2cNWIFST39eoiTUAW1kAcFMJwfIVkQlFh_kRw5LvRiUYnPgjb8" onerror="this.style.display='none'" class="w-4 h-4 rounded" />
+          Gemini
+        </button>
+        <button id="mat-llm-claude" onclick="selectMatLLM('claude')"
+          class="mat-llm-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg border-2 border-gray-300 text-gray-500 font-medium text-xs">
+          <span class="text-orange-500 font-bold leading-none">✦</span>
+          Claude
+        </button>
+      </div>
+      <textarea id="mat-ai-prompt" rows="2"
+        class="w-full border border-purple-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none mb-3 bg-white"
+        placeholder="Materyal tarifi... Örnek: koyu ahşap parke mat yüzey; beton zemin; kırmızı halı dokulu..."></textarea>
+      <div class="flex items-center gap-3">
+        <button onclick="generateAIMaterial()" id="btn-mat-gen"
+          class="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-xl text-sm font-medium transition-colors">
+          <span id="mat-gen-icon">✨</span> <span id="mat-gen-label">Üret</span>
+        </button>
+        <p id="mat-gen-result" class="text-xs text-gray-500"></p>
+      </div>
+    </div>
+
+    <div id="mat-current" class="hidden mb-5 p-3 bg-green-50 border border-green-200 rounded-xl">
+      <p class="text-sm font-semibold text-green-800 mb-0.5">✓ Materyal hazır</p>
+      <p id="mat-current-desc" class="text-xs text-green-700 truncate"></p>
+    </div>
+
+    <!-- Uygulama Hedefi -->
+    <div class="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+      <h3 class="text-sm font-semibold text-amber-800 mb-3">🎯 Uygulama Hedefi</h3>
+      <div class="flex items-center gap-2 mb-3">
+        <label class="text-xs text-amber-700 font-medium whitespace-nowrap">Hedef obje:</label>
+        <select id="mat-target-select"
+          class="flex-1 border border-amber-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white">
+          <option value="Room_Floor">Room_Floor</option>
+        </select>
+        <button onclick="refreshMatTargets()"
+          class="px-3 py-2 bg-amber-400 hover:bg-amber-500 text-white rounded-lg text-sm font-medium transition-colors">↺</button>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="applyMaterialToTarget()" id="btn-mat-apply"
+          class="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-xl text-sm font-medium transition-colors">
+          <span id="mat-apply-icon">🎨</span> <span id="mat-apply-label">Uygula</span>
+        </button>
+        <p id="mat-apply-result" class="text-xs text-gray-500 flex-1"></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MODELLER TAB ──────────────────────────────────────────── -->
+<div id="tab-modeller" class="hidden max-w-7xl mx-auto px-4 py-6 pb-24">
+
+  <!-- Model Kaynağı Seçimi -->
+  <div class="flex gap-2 mb-5">
+    <button onclick="setModelSource('local')" id="btn-src-local"
+      class="flex-1 py-2.5 rounded-2xl text-sm font-bold border-2 border-indigo-500 bg-indigo-50 text-indigo-700 shadow-sm transition-all">
+      📁 Yerel Katalog
+    </button>
+    <button onclick="setModelSource('sketchfab')" id="btn-src-sf"
+      class="flex-1 py-2.5 rounded-2xl text-sm font-bold border-2 border-gray-100 bg-white text-gray-400 hover:bg-gray-50 hover:border-gray-200 transition-all">
+      🌐 Sketchfab Arama
+    </button>
+  </div>
+
+  <!-- ── Model Üret Paneli ─────────────────────────────────────── -->
+  <div class="bg-white rounded-2xl shadow-sm border border-indigo-200 p-5 mb-5">
+    <!-- Header (toggle) -->
+    <button onclick="toggleGenPanel()" class="w-full flex items-center justify-between text-left group">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">🔨</span>
+        <div>
+          <p class="text-base font-semibold text-gray-800">Yeni Model Üret</p>
+          <p class="text-xs text-gray-400">Blender'da AI ile sıfırdan 3D model oluştur</p>
+        </div>
+      </div>
+      <span id="gen-panel-arrow" class="text-gray-400 text-lg transition-transform">▼</span>
+    </button>
+
+    <!-- Collapsible body -->
+    <div id="gen-panel-body" class="mt-4 space-y-4">
+
+      <!-- LLM selector -->
+      <div class="flex gap-2">
+        <button id="gm-llm-gemini" onclick="selectGenModelLLM('gemini')"
+          class="gm-llm-btn flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-indigo-500 text-indigo-700 font-medium text-sm">
+          <img src="https://lh3.googleusercontent.com/qnawW1V9XxMqekJBj2cNWIFST39eoiTUAW1kAcFMJwfIVkQlFh_kRw5LvRiUYnPgjb8" onerror="this.style.display='none'" class="w-5 h-5 rounded" />
+          Gemini
+        </button>
+        <button id="gm-llm-claude" onclick="selectGenModelLLM('claude')"
+          class="gm-llm-btn flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-gray-300 text-gray-500 font-medium text-sm">
+          <span class="text-orange-500 font-bold text-lg leading-none">✦</span>
+          Claude
+        </button>
+      </div>
+
+      <!-- Prompt -->
+      <div>
+        <label class="block text-xs font-medium text-gray-600 mb-1.5">Ne modellesin?</label>
+        <textarea id="gm-prompt" rows="3"
+          class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none"
+          placeholder="Örn: industrial tarzda metal raf, ahşap yuvarlak koltuk, cam sehpa..."></textarea>
+      </div>
+
+      <!-- Position hint -->
+      <div class="flex items-center gap-2 text-xs text-gray-400 bg-gray-50 rounded-lg px-3 py-2">
+        <span>📍</span>
+        <span>Blender'da 3D cursor'ı (<kbd class="bg-gray-200 px-1 rounded">Shift+Sağ Tık</kbd>) istediğin konuma yerleştir — model oraya oluşturulur.</span>
+        <button onclick="readCursorForGen()" class="ml-auto bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-2.5 py-1 rounded-lg whitespace-nowrap transition-colors">
+          Cursor Oku
+        </button>
+        <code id="gm-cursor-pos" class="font-mono text-indigo-600">[0,0,0]</code>
+      </div>
+
+      <!-- Generate button -->
+      <div class="flex items-center gap-3">
+        <button onclick="generateModel()" id="btn-generate-model"
+          class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-medium text-sm transition-colors">
+          <span id="gm-icon">✨</span>
+          <span id="gm-label">Üret</span>
+        </button>
+        <span id="gm-status" class="text-sm text-gray-500 flex-1"></span>
+      </div>
+
+      <!-- Result + Refine panel (shown after successful generation) -->
+      <div id="gm-result-panel" class="hidden bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+        <div class="flex items-start justify-between mb-2">
+          <div>
+            <p class="text-sm font-semibold text-emerald-800">✓ Model oluşturuldu</p>
+            <p id="gm-result-name" class="text-xs text-emerald-600 font-mono mt-0.5"></p>
+          </div>
+          <button onclick="document.getElementById('gm-script-wrap').classList.toggle('hidden')"
+            class="text-xs text-emerald-500 hover:text-emerald-800 underline">Kodu göster</button>
+        </div>
+
+        <!-- Save info box (updated by _autoSaveGeneratedModel) -->
+        <div id="gm-save-box" class="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2.5 mb-3 text-[11px] text-blue-800">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <p class="font-semibold mb-0.5">📍 Blender sahnesinde oluşturuldu</p>
+              <p>Konum: <span class="font-mono font-semibold" id="gm-result-pos">[0, 0, 0]</span></p>
+              <p id="gm-save-path-row" class="hidden mt-1">
+                💾 Kaydedilen yol:<br>
+                <span id="gm-save-path" class="font-mono text-blue-700 break-all"></span>
+              </p>
+              <p id="gm-save-pending" class="mt-1 text-blue-500">⏳ Dosya kaydediliyor...</p>
+            </div>
+            <span id="gm-save-badge" class="hidden shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 whitespace-nowrap">✓ Kaydedildi</span>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="flex flex-wrap gap-2 mb-3">
+          <button onclick="addSavedModelToScene()" id="btn-add-to-scene"
+            class="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors">
+            📥 Sahneye Ekle
+          </button>
+          <button onclick="findGeneratedModelInScene()"
+            class="flex items-center gap-1.5 bg-sky-600 hover:bg-sky-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
+            📷 Sahne'de Göster
+          </button>
+          <button onclick="focusGeneratedModel()"
+            class="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
+            🎯 Blender'da Odakla
+          </button>
+        </div>
+        <p id="gm-add-scene-status" class="text-[11px] text-gray-400 mb-2 hidden"></p>
+
+        <pre id="gm-script-wrap" class="hidden mb-3 bg-gray-900 text-green-300 text-[10px] rounded-lg p-3 overflow-x-auto max-h-48 overflow-y-auto leading-relaxed"><code id="gm-script-code"></code></pre>
+
+        <!-- Refine section -->
+        <div class="border-t border-emerald-200 pt-3">
+          <label class="block text-xs font-semibold text-emerald-700 mb-1.5">Düzelt / Geliştir</label>
+          <textarea id="gm-refine-prompt" rows="2"
+            class="w-full border border-emerald-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 resize-none bg-white"
+            placeholder="Örn: ayakları daha uzat, metalik yap, rengi kırmızıya çevir..."></textarea>
+          <div class="flex items-center gap-3 mt-2">
+            <button onclick="refineGeneratedModel()" id="btn-refine-model"
+              class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+              <span id="gm-refine-icon">🔧</span>
+              <span id="gm-refine-label">Uygula</span>
+            </button>
+            <button onclick="generateModel()" class="text-xs text-gray-500 hover:text-indigo-700 underline transition-colors">
+              Yeniden Üret
+            </button>
+            <span id="gm-refine-status" class="text-xs text-gray-500 flex-1"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- History -->
+      <div id="gm-history" class="hidden border-t border-gray-100 pt-3">
+        <p class="text-xs font-semibold text-gray-500 mb-2">Son Üretilenler</p>
+        <div id="gm-history-list" class="flex flex-wrap gap-2"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Katalog Filtre Barı ──────────────────────────────────── -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mb-5 sticky top-[53px] z-10">
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="flex gap-1.5 flex-wrap">
+        <button data-mf-cat="" onclick="filterModelsCat('')"
+          class="mf-cat-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-600 text-white shadow-sm transition-all">
+          Tümü
+        </button>
+        <button data-mf-cat="seating" onclick="filterModelsCat('seating')"
+          class="mf-cat-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all">
+          🪑 Oturma
+        </button>
+        <button data-mf-cat="tables" onclick="filterModelsCat('tables')"
+          class="mf-cat-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all">
+          🪞 Masalar
+        </button>
+        <button data-mf-cat="architecture" onclick="filterModelsCat('architecture')"
+          class="mf-cat-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all">
+          🏗 Mimari
+        </button>
+        <button data-mf-cat="kitchen" onclick="filterModelsCat('kitchen')"
+          class="mf-cat-btn px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all">
+          🍳 Mutfak
+        </button>
+      </div>
+
+      <div class="flex gap-1.5 flex-wrap" id="mf-style-btns">
+        <!-- Populated dynamically -->
+      </div>
+
+      <input id="model-search" type="search" placeholder="Model ara..."
+        oninput="filterModelsSearch(this.value)"
+        class="ml-auto border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 w-48" />
+
+      <button onclick="loadModelsTab(true)"
+        class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-lg text-xs font-medium transition-colors flex items-center gap-1">
+        ↺ Yenile
+      </button>
+    </div>
+  </div>
+
+  <div id="models-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+    <div class="col-span-full text-center py-16 text-gray-400">
+      <div class="text-4xl mb-3">📦</div>
+      <p class="text-sm">Modeller yüklemek için "↺ Yenile" butonuna bas</p>
+    </div>
+  </div>
+
+  <div id="models-empty" class="hidden text-center py-16 text-gray-400">
+    <div class="text-4xl mb-3">🔍</div>
+    <p class="text-sm">Bu filtreye uygun model bulunamadı</p>
+  </div>
+
+  <div id="model-sel-bar"
+    class="hidden fixed bottom-0 left-0 right-0 bg-indigo-700 text-white px-6 py-3 flex items-center justify-between shadow-2xl z-50">
+    <div class="flex items-center gap-3 min-w-0">
+      <span id="model-sel-count" class="text-sm font-bold whitespace-nowrap"></span>
+      <div id="model-sel-preview" class="text-indigo-200 text-xs truncate"></div>
+    </div>
+    <div class="flex items-center gap-3 ml-4 shrink-0">
+      <button onclick="clearModelSelections()"
+        class="text-indigo-300 hover:text-white text-sm transition-colors">✕ Temizle</button>
+      <button onclick="insertModelsToPrompt()"
+        class="bg-white text-indigo-700 hover:bg-indigo-50 px-5 py-2 rounded-lg text-sm font-bold transition-colors shadow-md">
+        ↩ Tasarım Sekmesine Ekle
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── SKETCHFAB TAB ─────────────────────────────────────────── -->
+<div id="tab-sketchfab" class="hidden max-w-7xl mx-auto px-4 py-6 pb-24">
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-5">
+    <div class="flex items-center gap-4">
+      <div class="text-3xl">🌐</div>
+      <div class="flex-1">
+        <h2 class="text-xl font-bold text-gray-800">Sketchfab Arama</h2>
+        <p class="text-sm text-gray-500">Milyonlarca 3D model arasından seçim yapın ve doğrudan kataloğunuza indirin.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="https://sketchfab.com" target="_blank" class="text-xs text-indigo-600 hover:underline">sketchfab.com ↗</a>
+      </div>
+    </div>
+    
+    <div class="mt-6 flex gap-3">
+      <div class="flex-1 relative">
+        <input id="sf-search-input" type="text" placeholder="Model ara (örn: office chair, vintage desk)..."
+          class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400 text-sm"
+          onkeyup="if(event.key==='Enter') searchSketchfab()" />
+        <span class="absolute left-3.5 top-3.5 text-gray-400">🔍</span>
+      </div>
+      <button onclick="searchSketchfab()" id="btn-sf-search"
+        class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold text-sm transition-all shadow-md flex items-center gap-2">
+        <span id="sf-search-icon">🔍</span> Arama Yap
+      </button>
+    </div>
+    
+    <div class="mt-4 flex flex-wrap gap-2">
+      <span class="text-xs font-medium text-gray-400 mr-2 py-1">Kategoriler:</span>
+      <button onclick="setSfCategory('', this)" class="sf-cat-btn-chip px-3 py-1 rounded-full text-[11px] font-semibold bg-indigo-100 text-indigo-700 border border-indigo-200 transition-all">Hepsi</button>
+      <button onclick="setSfCategory('furniture', this)" class="sf-cat-btn-chip px-3 py-1 rounded-full text-[11px] font-semibold bg-gray-50 text-gray-500 border border-gray-200 hover:bg-gray-100 transition-all">Mobilya</button>
+      <button onclick="setSfCategory('architecture', this)" class="sf-cat-btn-chip px-3 py-1 rounded-full text-[11px] font-semibold bg-gray-50 text-gray-500 border border-gray-200 hover:bg-gray-100 transition-all">Mimari</button>
+      <button onclick="setSfCategory('interior-design', this)" class="sf-cat-btn-chip px-3 py-1 rounded-full text-[11px] font-semibold bg-gray-50 text-gray-500 border border-gray-200 hover:bg-gray-100 transition-all">İç Tasarım</button>
+    </div>
+  </div>
+
+  <!-- Sonuçlar -->
+  <div id="sf-results-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 min-h-[400px]">
+    <div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400">
+      <div class="text-6xl mb-4">🔍</div>
+      <p class="text-lg font-medium">Başlamak için bir arama yapın</p>
+      <p class="text-sm opacity-70">Sadece indirilebilir ve Creative Commons lisanslı modeller listelenir.</p>
+    </div>
+  </div>
+  
+
+</div>
+
+<!-- ── ODA ÇİZ TAB ─────────────────────────────────────────── -->
+<div id="tab-ciz" class="hidden px-4 py-6">
+  <div class="flex gap-5 items-start">
+
+    <!-- ── Sol: Çizim alanı ─────────────────────────────────── -->
+    <div class="flex-1 min-w-0">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
+        <div class="mb-3">
+          <h2 class="text-base font-semibold text-gray-800">✏️ Oda Çiz</h2>
+          <p class="text-xs text-gray-400 mt-0.5">Köşelere tıkla · 0.5m ızgaraya yapışır · İlk noktaya tıkla → kapat</p>
+        </div>
+
+        <!-- Canvas -->
+        <canvas id="draw-canvas" width="600" height="460"
+          class="w-full border border-gray-200 rounded-xl cursor-crosshair bg-gray-50 block"
+          style="touch-action:none; max-width:600px"></canvas>
+
+        <!-- Stats -->
+        <div class="mt-2 flex gap-4 text-xs text-gray-500 font-mono">
+          <span id="draw-stat-dims">—</span>
+          <span id="draw-stat-area">—</span>
+          <span id="draw-stat-perim">—</span>
+        </div>
+
+        <!-- Controls row -->
+        <div class="mt-3 flex flex-wrap gap-2 items-center">
+          <div class="flex items-center gap-2">
+            <label class="text-xs text-gray-500 whitespace-nowrap">Tavan (m)</label>
+            <input id="draw-height" type="number" value="2.7" min="2" max="5" step="0.1"
+              class="w-20 border border-gray-300 rounded-lg px-2 py-1.5 text-sm">
+          </div>
+          <button onclick="clearDrawCanvas()"
+            class="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600">
+            🗑 Temizle
+          </button>
+          <button id="btn-use-drawn-room" onclick="useDrawnRoom()"
+            class="px-4 py-1.5 text-sm font-semibold rounded-lg bg-indigo-600 text-white hover:bg-indigo-700">
+            ✅ Bu Oda ile Tasarla
+          </button>
+        </div>
+
+        <div id="draw-used-note" class="hidden mt-2 text-xs text-green-700 font-medium bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+          ✓ Özel oda aktif — Tasarım tabına geç
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Sağ: Kayıtlı Odalar ─────────────────────────────── -->
+    <div class="w-72 flex-shrink-0">
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 flex flex-col gap-4">
+
+        <!-- Kaydet formu -->
+        <div>
+          <h3 class="text-sm font-semibold text-gray-800 mb-3">💾 Oda Kaydet</h3>
+          <input id="draw-room-name" type="text" placeholder="Oda adı (Salon, Ofis...)"
+            class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 mb-2" />
+          <button id="btn-save-drawn-room" onclick="saveDrawnRoom()"
+            class="w-full py-2 text-sm font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors">
+            💾 Oda Kaydet
+          </button>
+          <p id="draw-save-hint" class="text-[10px] text-gray-400 mt-1.5">Sol tarafta oda çiz ve ilk noktaya tıklayarak kapat, ardından kaydet.</p>
+        </div>
+
+        <!-- Divider -->
+        <div class="border-t border-gray-100"></div>
+
+        <!-- Kayıtlı liste -->
+        <div>
+          <h3 class="text-sm font-semibold text-gray-800 mb-3">📁 Kayıtlı Odalar</h3>
+          <p id="saved-draw-rooms-empty" class="text-xs text-gray-400 italic">Henüz kayıtlı oda yok.</p>
+          <div id="saved-draw-rooms-list" class="flex flex-col gap-2.5 max-h-[520px] overflow-y-auto pr-0.5"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── SİSTEM TAB ────────────────────────────────────────────── -->
+<div id="tab-sistem" class="hidden max-w-5xl mx-auto px-4 py-6 pb-28">
+
+  <!-- Pipeline diyagramı -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-5">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-lg font-semibold text-gray-800">⚙️ Sistem — Tasarım Akışı & Prompt Yönetimi</h2>
+      <span class="text-xs text-gray-400">Node'a tıkla → editör'e git</span>
+    </div>
+    <div id="sistem-flow-diagram"></div>
+  </div>
+
+  <!-- Akış yolları -->
+  <div id="sistem-flow-info" class="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 mb-5"></div>
+
+  <!-- Ajan editörleri -->
+  <div id="sistem-agents-list" class="flex flex-col gap-5"></div>
+
+  <!-- Sticky action bar -->
+  <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg px-6 py-3 flex items-center gap-4 z-40">
+    <button onclick="saveAllSystemPrompts()"
+      class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-xl text-sm font-semibold transition-colors">
+      💾 Tüm Değişiklikleri Kaydet
+    </button>
+    <span id="sistem-save-status" class="text-sm text-gray-500 flex-1"></span>
+    <span class="text-xs text-gray-400 hidden sm:block">
+      Değişiklikler <code class="bg-gray-100 px-1 rounded">agent_prompts.json</code>'a kaydedilir · Sunucu yeniden başlatmaya gerek yok
+    </span>
+  </div>
+</div>
+<!-- ──────────────────────────────────────────────────────────── -->
+
+<!-- Sketchfab download overlay — fixed, always rendered at body level -->
+<div id="sf-status-overlay" class="hidden fixed bottom-6 right-6 w-80 bg-white rounded-2xl shadow-2xl border border-gray-200 p-5 z-[200]">
+  <div class="flex items-center justify-between mb-3">
+    <h3 class="text-sm font-bold text-gray-800 flex items-center gap-2">
+      <span id="sf-dl-icon" class="animate-spin">⏳</span> <span id="sf-dl-title">İndiriliyor...</span>
+    </h3>
+    <button onclick="document.getElementById('sf-status-overlay').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 text-lg">×</button>
+  </div>
+  <p id="sf-dl-name" class="text-xs font-semibold text-gray-600 truncate mb-2"></p>
+  <div class="w-full bg-gray-100 rounded-full h-2 mb-3 overflow-hidden">
+    <div id="sf-dl-progress" class="bg-indigo-500 h-full w-0 transition-all duration-500"></div>
+  </div>
+  <div id="sf-dl-log" class="text-[10px] text-gray-400 font-mono h-24 overflow-y-auto bg-gray-50 rounded p-2 leading-relaxed"></div>
+</div>
+
+<!-- JS files — load order: state → materials → coach → scene → window-views → draw → models → app -->
+<script src="/ui/js/state.js?v=20260530h"></script>
+<script src="/ui/js/materials.js?v=20260530h"></script>
+<script src="/ui/js/coach.js?v=20260530h"></script>
+<script src="/ui/js/scene.js?v=20260530h"></script>
+<script src="/ui/js/window-views.js?v=20260530h"></script>
+<script src="/ui/js/draw.js?v=20260530h"></script>
+<script src="/ui/js/models.js?v=20260530h"></script>
+<script src="/ui/js/sketchfab.js?v=20260530h"></script>
+<script src="/ui/js/sistem.js?v=20260531a"></script>
+<script src="/ui/js/app.js?v=20260530h"></script>
+</body>
+</html>

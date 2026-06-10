@@ -1,0 +1,767 @@
+{
+  "$schema": "./schema/catalog_schema.json",
+  "library_name": "BlenderAgent Asset Library",
+  "version": "2.0.0",
+  "created_at": "2026-05-10",
+  "updated_at": "2026-05-29",
+  "default_unit": "meters",
+  "coordinate_system": "Z-up, right-handed",
+  "blender_version_min": "4.0",
+  "schema_notes": "v2.0 â€” semantic_tags, room_types, is_container, footprint, placement block, compatible_with eklendi. Eski alanlar (dimensions_m, origin, facing_correction_z) geriye uyumluluk iÃ§in korunur.",
+  "categories_taxonomy": {
+    "seating": [
+      "sofa",
+      "armchair",
+      "dining_chair",
+      "office_chair",
+      "bar_stool",
+      "bench",
+      "pouf",
+      "rocking_chair",
+      "lounge_chair"
+    ],
+    "tables": [
+      "dining_table",
+      "coffee_table",
+      "side_table",
+      "desk",
+      "nightstand",
+      "console_table",
+      "kitchen_counter"
+    ],
+    "storage": [
+      "wardrobe",
+      "cabinet",
+      "bookshelf",
+      "tv_stand",
+      "dresser",
+      "shoe_rack",
+      "kitchen_cabinet"
+    ],
+    "beds": [
+      "single_bed",
+      "double_bed",
+      "queen_bed",
+      "king_bed",
+      "bunk_bed",
+      "sofa_bed"
+    ],
+    "lighting": [
+      "floor_lamp",
+      "table_lamp",
+      "pendant",
+      "ceiling_light",
+      "wall_sconce",
+      "strip_light",
+      "chandelier"
+    ],
+    "decor": [
+      "rug",
+      "plant",
+      "artwork",
+      "mirror",
+      "curtain",
+      "vase",
+      "cushion",
+      "clock"
+    ],
+    "structural": [
+      "wall",
+      "floor",
+      "ceiling",
+      "door",
+      "window",
+      "staircase",
+      "column",
+      "beam"
+    ],
+    "kitchen": [
+      "refrigerator",
+      "oven",
+      "dishwasher",
+      "sink",
+      "hood",
+      "microwave",
+      "coffee_station"
+    ],
+    "bathroom": [
+      "bathtub",
+      "toilet",
+      "sink_bathroom",
+      "shower",
+      "towel_rack",
+      "bathroom_cabinet"
+    ],
+    "outdoor": [
+      "garden_chair",
+      "garden_table",
+      "planter",
+      "bbq",
+      "swing"
+    ],
+    "architecture": [
+      "residential",
+      "commercial",
+      "industrial",
+      "apartment",
+      "villa"
+    ]
+  },
+  "semantic_tag_vocabulary": {
+    "rooms": [
+      "office",
+      "home_office",
+      "study",
+      "living_room",
+      "bedroom",
+      "dining_room",
+      "kitchen",
+      "bathroom",
+      "lobby",
+      "outdoor"
+    ],
+    "purpose": [
+      "work",
+      "rest",
+      "dining",
+      "storage",
+      "decoration",
+      "lighting",
+      "circulation"
+    ],
+    "audience": [
+      "residential",
+      "commercial",
+      "hospitality"
+    ],
+    "ambience": [
+      "minimal",
+      "cozy",
+      "industrial",
+      "classic",
+      "modern",
+      "luxury",
+      "vintage",
+      "rustic"
+    ]
+  },
+  "assets": [
+    {
+      "id": "sofa_leather_black_01",
+      "name": "Sofa_Leather_Black_01",
+      "category": "seating",
+      "subcategory": "sofa",
+      "style": [
+        "classic",
+        "chesterfield",
+        "vintage"
+      ],
+      "tags": [],
+      "semantic_tags": [
+        "living_room",
+        "lobby",
+        "modern",
+        "rest"
+      ],
+      "room_types": [
+        "living_room",
+        "lobby",
+        "office",
+        "home_office"
+      ],
+      "is_container": false,
+      "scale_class": "human",
+      "compatible_with": [
+        "coffee_table",
+        "side_table",
+        "floor_lamp",
+        "rug",
+        "desk"
+      ],
+      "footprint": {
+        "width_m": 1.807,
+        "depth_m": 0.818,
+        "height_m": 0.709,
+        "clearance_front_m": 0.6,
+        "clearance_sides_m": 0.15
+      },
+      "placement": {
+        "rules": [
+          "floor",
+          "wall_optional",
+          "center_ok"
+        ],
+        "anchor": "floor_center",
+        "forward_axis": "-Y",
+        "facing_correction_z": 0,
+        "confidence": 0.8
+      },
+      "file": "models/seating/sofa_leather_black_01/sofa_02_4k.blend",
+      "texture_resolution": "4k",
+      "material_slots": [
+        {
+          "slot": "sofa_02",
+          "type": "unknown",
+          "default_color": "#888888"
+        }
+      ],
+      "textures": {
+        "metallic": "models/seating/sofa_leather_black_01/textures/sofa_02_metallic_4k.exr",
+        "roughness": "models/seating/sofa_leather_black_01/textures/sofa_02_roughness_4k.jpg",
+        "diffuse": "models/seating/sofa_leather_black_01/textures/sofa_02_diff_4k.jpg",
+        "normal_gl": "models/seating/sofa_leather_black_01/textures/sofa_02_nor_gl_4k.exr"
+      },
+      "dimensions_m": {
+        "width": 1.807,
+        "depth": 0.818,
+        "height": 0.709
+      },
+      "origin": "floor_center",
+      "facing_correction_z": 180.0,
+      "poly_count": 2554,
+      "added_at": "2026-05-25",
+      "source": "zip/sofa_02_4k.blend.zip"
+    },
+    {
+      "id": "metal_office_desk_4k",
+      "name": "metal_office_desk_4k",
+      "category": "tables",
+      "subcategory": "desk",
+      "style": [
+        "corporate",
+        "retro",
+        "industrial",
+        "office"
+      ],
+      "tags": [
+        "metal"
+      ],
+      "semantic_tags": [
+        "office",
+        "home_office",
+        "study",
+        "modern",
+        "work"
+      ],
+      "room_types": [
+        "office",
+        "home_office",
+        "study"
+      ],
+      "is_container": false,
+      "scale_class": "human",
+      "compatible_with": [
+        "office_chair",
+        "armchair",
+        "table_lamp",
+        "bookshelf"
+      ],
+      "footprint": {
+        "width_m": 2.0,
+        "depth_m": 0.947,
+        "height_m": 0.788,
+        "clearance_front_m": 0.8,
+        "clearance_sides_m": 0.1
+      },
+      "placement": {
+        "rules": [
+          "floor",
+          "wall_optional",
+          "center_ok"
+        ],
+        "anchor": "floor_center",
+        "forward_axis": "-Y",
+        "facing_correction_z": 180,
+        "confidence": 0.6
+      },
+      "file": "models/tables/metal_office_desk_4k/metal_office_desk_4k.blend",
+      "texture_resolution": "4k",
+      "material_slots": [
+        {
+          "slot": "metal_office_desk",
+          "type": "unknown",
+          "default_color": "#888888"
+        }
+      ],
+      "textures": {
+        "diffuse": "models/tables/metal_office_desk_4k/textures/metal_office_desk_diff_4k.jpg",
+        "metallic": "models/tables/metal_office_desk_4k/textures/metal_office_desk_nor_gl_4k.exr",
+        "roughness": "models/tables/metal_office_desk_4k/textures/metal_office_desk_rough_4k.exr"
+      },
+      "dimensions_m": {
+        "width": 2.0,
+        "depth": 0.947,
+        "height": 0.788
+      },
+      "origin": "floor_center",
+      "facing_correction_z": 180.0,
+      "poly_count": 3557,
+      "added_at": "2026-05-25",
+      "source": "zip/metal_office_desk_4k.blend.zip"
+    },
+    {
+      "id": "mid_century_lounge_chair_4k",
+      "name": "Mid_Century_Lounge_Chair_4K",
+      "category": "seating",
+      "subcategory": "armchair",
+      "style": [
+        "mid-century",
+        "retro",
+        "vintage"
+      ],
+      "tags": [],
+      "semantic_tags": [
+        "living_room",
+        "office",
+        "home_office",
+        "vintage",
+        "rest",
+        "work"
+      ],
+      "room_types": [
+        "living_room",
+        "office",
+        "home_office",
+        "study"
+      ],
+      "is_container": false,
+      "scale_class": "human",
+      "compatible_with": [
+        "desk",
+        "side_table",
+        "floor_lamp",
+        "coffee_table"
+      ],
+      "footprint": {
+        "width_m": 1.009,
+        "depth_m": 1.19,
+        "height_m": 1.169,
+        "clearance_front_m": 0.4,
+        "clearance_sides_m": 0.1
+      },
+      "placement": {
+        "rules": [
+          "floor",
+          "freestanding",
+          "center_ok"
+        ],
+        "anchor": "floor_center",
+        "forward_axis": "-Y",
+        "facing_correction_z": 180,
+        "confidence": 0.65
+      },
+      "file": "models/seating/mid_century_lounge_chair_4k/mid_century_lounge_chair_4k.blend",
+      "texture_resolution": "4k",
+      "material_slots": [
+        {
+          "slot": "mid_century_lounge_chair",
+          "type": "unknown",
+          "default_color": "#888888"
+        }
+      ],
+      "textures": {
+        "diffuse": "models/seating/mid_century_lounge_chair_4k/textures/mid_century_lounge_chair_diff_4k.jpg",
+        "metallic": "models/seating/mid_century_lounge_chair_4k/textures/mid_century_lounge_chair_metal_4k.exr",
+        "normal_gl": "models/seating/mid_century_lounge_chair_4k/textures/mid_century_lounge_chair_nor_gl_4k.exr",
+        "roughness": "models/seating/mid_century_lounge_chair_4k/textures/mid_century_lounge_chair_rough_4k.exr"
+      },
+      "dimensions_m": {
+        "width": 1.009,
+        "depth": 1.19,
+        "height": 1.169
+      },
+      "origin": "floor_center",
+      "facing_correction_z": 180.0,
+      "poly_count": 3161,
+      "added_at": "2026-05-25",
+      "source": "zip/mid_century_lounge_chair_4k.blend.zip"
+    },
+    {
+      "id": "artichoke_red",
+      "name": "Artichoke Red",
+      "category": "seating",
+      "subcategory": "lounge_chair",
+      "style": [
+        "modern"
+      ],
+      "tags": [],
+      "semantic_tags": [
+        "lounge",
+        "design",
+        "iconic",
+        "modern",
+        "living_room"
+      ],
+      "room_types": [
+        "living_room",
+        "bedroom",
+        "lobby"
+      ],
+      "is_container": false,
+      "scale_class": "human",
+      "compatible_with": [
+        "coffee_table",
+        "side_table",
+        "floor_lamp",
+        "rug"
+      ],
+      "footprint": {
+        "width_m": 0.9801,
+        "depth_m": 0.7361,
+        "height_m": 0.8749,
+        "clearance_front_m": 0.6,
+        "clearance_sides_m": 0.15
+      },
+      "placement": {
+        "rules": [
+          "floor",
+          "wall_optional",
+          "center_ok"
+        ],
+        "anchor": "floor_center",
+        "forward_axis": "-X",
+        "facing_correction_z": 0,
+        "confidence": 0.8
+      },
+      "file": "models/seating/Artichoke_Red/Artichoke_Red/Artichoke_Red.blend",
+      "texture_resolution": "unknown",
+      "material_slots": [
+        {
+          "slot": "wire_166229229",
+          "type": "unknown",
+          "default_color": "#888888"
+        },
+        {
+          "slot": "wire_225143087",
+          "type": "unknown",
+          "default_color": "#888888"
+        },
+        {
+          "slot": "wire_177027088",
+          "type": "unknown",
+          "default_color": "#888888"
+        }
+      ],
+      "textures": {},
+      "dimensions_m": {
+        "width": 0.9801,
+        "depth": 0.7361,
+        "height": 0.8749
+      },
+      "origin": "floor_center",
+      "facing_correction_z": 90.0,
+      "poly_count": 35072,
+      "added_at": "2026-05-29",
+      "source": "zip/Artichoke_Red.zip",
+      "import_scale": 0.01,
+      "rotation_correction": [
+        90.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "id": "ahsap_masa",
+      "name": "Ahsap Masa",
+      "category": "tables",
+      "subcategory": "desk",
+      "style": [
+        "modern",
+        "minimal"
+      ],
+      "tags": [
+        "ai-generated",
+        "wood"
+      ],
+      "semantic_tags": [
+        "generated",
+        "custom",
+        "work"
+      ],
+      "room_types": [
+        "office",
+        "home_office",
+        "study",
+        "living_room"
+      ],
+      "is_container": false,
+      "scale_class": "human",
+      "compatible_with": [],
+      "import_scale": 1.0,
+      "footprint": {
+        "width_m": 1.65159,
+        "depth_m": 0.832811,
+        "height_m": 0.891295,
+        "clearance_front_m": 0.5,
+        "clearance_sides_m": 0.1
+      },
+      "placement": {
+        "rules": [
+          "floor",
+          "center_ok"
+        ],
+        "anchor": "floor_center",
+        "forward_axis": "+Y",
+        "facing_correction_z": 0,
+        "confidence": 1.0
+      },
+      "file": "models/generated/gm_ah_ap_materialli_bir_ah_ap_m/gm_ah_ap_materialli_bir_ah_ap_m.blend",
+      "dimensions_m": {
+        "width": 1.65159,
+        "depth": 0.832811,
+        "height": 0.891295
+      },
+      "origin": "floor_center",
+      "facing_correction_z": 0,
+      "poly_count": 0,
+      "added_at": "2026-05-29",
+      "source": "ai-generated",
+      "prompt": "ahÅŸap materialli bir ahÅŸap masa yap"
+    },
+    {
+      "id": "metal_uzun_dolap",
+      "name": "metal uzun dolap",
+      "category": "storage",
+      "subcategory": "wardrobe",
+      "style": [
+        "industrial"
+      ],
+      "tags": [
+        "ai-generated",
+        "metal"
+      ],
+      "semantic_tags": [
+        "generated",
+        "custom",
+        "storage"
+      ],
+      "room_types": [
+        "office",
+        "bedroom",
+        "living_room"
+      ],
+      "is_container": false,
+      "scale_class": "human",
+      "compatible_with": [],
+      "import_scale": 1.0,
+      "footprint": {
+        "width_m": 1.22168,
+        "depth_m": 0.643332,
+        "height_m": 2.45636,
+        "clearance_front_m": 0.5,
+        "clearance_sides_m": 0.1
+      },
+      "placement": {
+        "rules": [
+          "floor",
+          "center_ok"
+        ],
+        "anchor": "floor_center",
+        "forward_axis": "-Y",
+        "facing_correction_z": 1.23667,
+        "confidence": 1.0
+      },
+      "file": "models/generated/gm_a_tall_industrial_metal_stor/gm_a_tall_industrial_metal_stor.blend",
+      "dimensions_m": {
+        "width": 1.22168,
+        "depth": 0.643332,
+        "height": 2.45636
+      },
+      "origin": "floor_center",
+      "facing_correction_z": 180.0,
+      "poly_count": 0,
+      "added_at": "2026-05-29",
+      "source": "ai-generated",
+      "prompt": "A tall industrial metal storage cabinet, standalone 3D asset. Brushed steel material with metallic reflection. Completely isolated, no background, transparent background, zero environment details, solo object. Asset Name: Cabinet_Metal_Tall_01. Slug: cabinet_metal_tall_01. PBR textures, clean topology."
+    },
+    {
+      "id": "gm_55_ekran_tv_ret",
+      "name": "55 ekran TV",
+      "category": "storage",
+      "subcategory": "tv_stand",
+      "style": [
+        "modern"
+      ],
+      "tags": [
+        "ai-generated"
+      ],
+      "semantic_tags": [
+        "generated",
+        "custom"
+      ],
+      "room_types": [
+        "living_room",
+        "bedroom"
+      ],
+      "is_container": false,
+      "scale_class": "human",
+      "compatible_with": [],
+      "import_scale": 1.6,
+      "proportion_warning": false,
+      "footprint": {
+        "width_m": 0.8,
+        "depth_m": 0.8,
+        "height_m": 0.8,
+        "clearance_front_m": 0.5,
+        "clearance_sides_m": 0.1
+      },
+      "placement": {
+        "rules": [
+          "floor",
+          "center_ok"
+        ],
+        "anchor": "floor_center",
+        "forward_axis": "+X",
+        "facing_correction_z": 0,
+        "confidence": 1.0
+      },
+      "file": "models/generated/gm_55_ekran_tv_ret/gm_55_ekran_tv_ret.blend",
+      "dimensions_m": {
+        "width": 0.8,
+        "depth": 0.8,
+        "height": 0.8
+      },
+      "origin": "floor_center",
+      "facing_correction_z": 270.0,
+      "poly_count": 0,
+      "added_at": "2026-05-29",
+      "source": "ai-generated",
+      "prompt": "55' ekran tv Ã¼ret"
+    },
+    {
+      "id": "sf_af2f07d06f63",
+      "name": "Office chair",
+      "category": "seating",
+      "subcategory": "office_chair",
+      "source": "sketchfab",
+      "sketchfab_uid": "af2f07d06f6349158c1d24d87f5ceb95",
+      "room_types": [
+        "office",
+        "home_office",
+        "study"
+      ],
+      "is_container": false,
+      "scale_class": "human",
+      "file": "models/sketchfab/af2f07d06f6349158c1d24d87f5ceb95/af2f07d06f6349158c1d24d87f5ceb95.blend",
+      "dimensions_m": {
+        "width": 0.6782,
+        "depth": 0.7217,
+        "height": 1.0616
+      },
+      "import_scale": 1.0,
+      "added_at": "2026-05-29",
+      "placement": {
+        "rules": [
+          "floor"
+        ],
+        "anchor": "floor_center",
+        "forward_axis": "+Y",
+        "facing_correction_z": 0
+      }
+    },
+    {
+      "id": "sf_a6cc78ad3aa2",
+      "name": "Merchandiser Refrigerator",
+      "category": "kitchen",
+      "subcategory": "refrigerator",
+      "source": "sketchfab",
+      "sketchfab_uid": "a6cc78ad3aa24b2580f212fca0c7abd5",
+      "room_types": [
+        "kitchen"
+      ],
+      "is_container": false,
+      "scale_class": "human",
+      "file": "models/sketchfab/a6cc78ad3aa24b2580f212fca0c7abd5/a6cc78ad3aa24b2580f212fca0c7abd5.blend",
+      "dimensions_m": {
+        "width": 1.4342,
+        "depth": 0.7331,
+        "height": 2.2455
+      },
+      "import_scale": 1.0,
+      "added_at": "2026-05-29",
+      "placement": {
+        "rules": [
+          "floor",
+          "wall_optional"
+        ],
+        "anchor": "floor_center",
+        "forward_axis": "+Y",
+        "facing_correction_z": 0
+      },
+      "rotation_correction": [
+        -90,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "sf_62dbd2a0afb4",
+      "name": "Wooden Sofa",
+      "category": "sketchfab",
+      "subcategory": "sofa",
+      "source": "sketchfab",
+      "sketchfab_uid": "62dbd2a0afb44b21ab43dcc936eb1d65",
+      "file": "models/sketchfab/62dbd2a0afb44b21ab43dcc936eb1d65/62dbd2a0afb44b21ab43dcc936eb1d65.blend",
+      "dimensions_m": {
+        "width": 0.8822,
+        "depth": 1.2796,
+        "height": 1.0218
+      },
+      "import_scale": 1.0,
+      "added_at": "2026-05-31",
+      "placement": {
+        "rules": [
+          "floor"
+        ],
+        "anchor": "floor_center",
+        "forward_axis": "+Y"
+      }
+    },
+    {
+      "id": "sf_c226b9e0cace",
+      "name": "Chair",
+      "category": "sketchfab",
+      "subcategory": "chair",
+      "source": "sketchfab",
+      "sketchfab_uid": "c226b9e0cace4a20bf017b7061ada18d",
+      "file": "models/sketchfab/c226b9e0cace4a20bf017b7061ada18d/c226b9e0cace4a20bf017b7061ada18d.blend",
+      "dimensions_m": {
+        "width": 0.4236,
+        "depth": 0.489,
+        "height": 0.996
+      },
+      "import_scale": 1.0,
+      "added_at": "2026-05-31",
+      "placement": {
+        "rules": [
+          "floor"
+        ],
+        "anchor": "floor_center",
+        "forward_axis": "+Y"
+      }
+    },
+    {
+      "id": "sf_7044aedec91b",
+      "name": "floor lamp",
+      "category": "sketchfab",
+      "subcategory": "floor_lamp",
+      "source": "sketchfab",
+      "sketchfab_uid": "7044aedec91b4e28916a20b0ce026217",
+      "file": "models/sketchfab/7044aedec91b4e28916a20b0ce026217/7044aedec91b4e28916a20b0ce026217.blend",
+      "dimensions_m": {
+        "width": 0.6906,
+        "depth": 0.7811,
+        "height": 1.6
+      },
+      "import_scale": 1.224552,
+      "added_at": "2026-05-31",
+      "placement": {
+        "rules": [
+          "floor"
+        ],
+        "anchor": "floor_center",
+        "forward_axis": "+Y"
+      }
+    }
+  ]
+}

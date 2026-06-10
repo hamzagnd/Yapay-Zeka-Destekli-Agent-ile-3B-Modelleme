@@ -1,0 +1,185 @@
+{
+  "category_keywords": {
+    "seating": ["sofa", "couch", "armchair", "chair", "stool", "bench", "pouf", "ottoman", "chesterfield", "lounge", "recliner", "rocking"],
+    "tables": ["table", "desk", "counter", "nightstand", "console", "coffee_table", "dining_table", "workstation", "bedside"],
+    "storage": ["wardrobe", "cabinet", "shelf", "shelving", "dresser", "rack", "bookcase", "bookshelf", "tv_stand", "media_console", "closet", "cupboard"],
+    "beds": ["bed", "bunk", "mattress", "crib"],
+    "lighting": ["lamp", "light", "pendant", "sconce", "chandelier", "lantern", "ceiling_light", "floor_lamp", "table_lamp", "strip_light"],
+    "decor": ["rug", "carpet", "plant", "mirror", "curtain", "vase", "clock", "artwork", "painting", "cushion"],
+    "structural": ["wall", "floor", "ceiling", "door", "window", "staircase", "stairs", "column", "beam"],
+    "kitchen": ["fridge", "refrigerator", "oven", "sink", "hood", "microwave", "cart", "coffee_machine", "coffee_cart", "coffee_station", "stove", "dishwasher"],
+    "bathroom": ["bathtub", "toilet", "shower", "towel", "bathroom_cabinet", "sink_bathroom"],
+    "outdoor": ["garden", "outdoor", "planter", "bbq", "swing", "pergola", "patio"],
+    "architecture": ["house", "building", "arch", "storey", "story", "home", "villa", "apartment", "cabin", "residential", "commercial"]
+  },
+  "subcategory_keywords": {
+    "seating": {
+      "sofa": ["sofa", "couch", "chesterfield"],
+      "armchair": ["armchair", "lounge_chair", "lounge", "recliner"],
+      "dining_chair": ["dining_chair", "dinner_chair"],
+      "office_chair": ["office_chair", "task_chair", "swivel"],
+      "bar_stool": ["bar_stool", "barstool", "stool"],
+      "bench": ["bench"],
+      "pouf": ["pouf", "ottoman"],
+      "rocking_chair": ["rocking_chair"],
+      "lounge_chair": ["lounge_chair"]
+    },
+    "tables": {
+      "desk": ["desk", "workstation"],
+      "coffee_table": ["coffee_table", "cocktail_table"],
+      "dining_table": ["dining_table", "dinner_table"],
+      "side_table": ["side_table", "end_table", "accent_table"],
+      "nightstand": ["nightstand", "bedside"],
+      "console_table": ["console_table", "console"],
+      "kitchen_counter": ["kitchen_counter", "counter"]
+    },
+    "storage": {
+      "wardrobe": ["wardrobe", "armoire", "closet"],
+      "cabinet": ["cabinet", "cupboard"],
+      "bookshelf": ["bookshelf", "bookcase"],
+      "tv_stand": ["tv_stand", "media_console"],
+      "dresser": ["dresser", "chest"],
+      "shoe_rack": ["shoe_rack"],
+      "kitchen_cabinet": ["kitchen_cabinet"]
+    },
+    "beds": {
+      "single_bed": ["single_bed", "twin_bed"],
+      "double_bed": ["double_bed", "full_bed"],
+      "queen_bed": ["queen_bed"],
+      "king_bed": ["king_bed"],
+      "bunk_bed": ["bunk_bed", "bunk"],
+      "sofa_bed": ["sofa_bed"]
+    },
+    "lighting": {
+      "floor_lamp": ["floor_lamp"],
+      "table_lamp": ["table_lamp", "desk_lamp"],
+      "pendant": ["pendant"],
+      "ceiling_light": ["ceiling_light"],
+      "wall_sconce": ["wall_sconce", "sconce"],
+      "strip_light": ["strip_light"],
+      "chandelier": ["chandelier"]
+    },
+    "decor": {
+      "rug": ["rug", "carpet"],
+      "plant": ["plant"],
+      "artwork": ["artwork", "painting"],
+      "mirror": ["mirror"],
+      "curtain": ["curtain"],
+      "vase": ["vase"],
+      "cushion": ["cushion"],
+      "clock": ["clock"]
+    },
+    "structural": {
+      "wall": ["wall"],
+      "floor": ["floor"],
+      "ceiling": ["ceiling"],
+      "door": ["door"],
+      "window": ["window"],
+      "staircase": ["staircase", "stairs"],
+      "column": ["column"],
+      "beam": ["beam"]
+    },
+    "kitchen": {
+      "coffee_station": ["coffee_station", "coffee_cart", "coffee_machine", "coffeecart"],
+      "refrigerator": ["fridge", "refrigerator"],
+      "oven": ["oven", "stove"],
+      "dishwasher": ["dishwasher"],
+      "sink": ["kitchen_sink", "sink"],
+      "hood": ["hood", "range_hood"],
+      "microwave": ["microwave"]
+    },
+    "bathroom": {
+      "bathtub": ["bathtub", "tub"],
+      "toilet": ["toilet"],
+      "sink_bathroom": ["bathroom_sink", "sink_bathroom", "vanity"],
+      "shower": ["shower"],
+      "towel_rack": ["towel_rack", "towel"],
+      "bathroom_cabinet": ["bathroom_cabinet"]
+    },
+    "outdoor": {
+      "garden_chair": ["garden_chair", "outdoor_chair", "patio_chair"],
+      "garden_table": ["garden_table", "outdoor_table", "patio_table"],
+      "planter": ["planter"],
+      "bbq": ["bbq", "grill"],
+      "swing": ["swing"]
+    },
+    "architecture": {
+      "residential": ["house", "home", "storey", "story", "two_story", "two-storey", "two-story", "residential", "cabin"],
+      "commercial": ["office_building", "shop", "commercial"],
+      "industrial": ["industrial_building", "warehouse"],
+      "apartment": ["apartment", "flat"],
+      "villa": ["villa"]
+    }
+  },
+  "style_hints": {
+    "chesterfield": ["classic", "victorian", "chesterfield"],
+    "mid_century": ["mid-century", "retro", "vintage"],
+    "mid-century": ["mid-century", "retro", "vintage"],
+    "midcentury": ["mid-century", "retro", "vintage"],
+    "industrial": ["industrial", "metal", "raw"],
+    "rustic": ["rustic", "farmhouse", "wood"],
+    "scandinavian": ["scandinavian", "nordic", "minimalist"],
+    "nordic": ["scandinavian", "nordic", "minimalist"],
+    "art_deco": ["art_deco", "glamour", "luxury"],
+    "minimalist": ["minimalist", "clean", "simple"],
+    "modern": ["modern", "contemporary"],
+    "contemporary": ["modern", "contemporary"],
+    "classic": ["classic", "traditional"],
+    "vintage": ["vintage", "retro"]
+  },
+  "tag_keywords": ["leather", "wood", "metal", "steel", "glass", "marble", "plastic", "fabric", "concrete", "chrome", "brass", "gold", "black", "white", "brown", "gray", "grey", "tufted", "weathered", "vintage", "drawers", "wheels", "garage", "stairs", "exterior", "interior_shell"],
+  "subcategory_rooms": {
+    "sofa": ["living_room", "lobby"],
+    "armchair": ["living_room", "office", "home_office"],
+    "lounge_chair": ["living_room", "office", "home_office"],
+    "dining_chair": ["dining_room"],
+    "office_chair": ["office", "home_office", "study"],
+    "bar_stool": ["kitchen", "bar"],
+    "bench": ["lobby", "outdoor", "dining_room"],
+    "pouf": ["living_room", "bedroom"],
+    "desk": ["office", "home_office", "study"],
+    "coffee_table": ["living_room"],
+    "dining_table": ["dining_room"],
+    "side_table": ["living_room", "bedroom"],
+    "nightstand": ["bedroom"],
+    "console_table": ["lobby", "living_room"],
+    "wardrobe": ["bedroom"],
+    "cabinet": ["living_room", "office", "bedroom"],
+    "bookshelf": ["office", "study", "living_room"],
+    "tv_stand": ["living_room"],
+    "dresser": ["bedroom"],
+    "single_bed": ["bedroom"],
+    "double_bed": ["bedroom"],
+    "queen_bed": ["bedroom"],
+    "king_bed": ["bedroom"],
+    "coffee_station": ["kitchen", "office", "lobby", "cafe"],
+    "refrigerator": ["kitchen"],
+    "floor_lamp": ["living_room", "bedroom", "office"],
+    "table_lamp": ["bedroom", "office", "living_room"],
+    "pendant": ["dining_room", "kitchen"],
+    "residential": ["residential"],
+    "apartment": ["residential"],
+    "villa": ["residential"]
+  },
+  "subcategory_compatible": {
+    "desk": ["office_chair", "armchair", "table_lamp", "bookshelf"],
+    "office_chair": ["desk"],
+    "sofa": ["coffee_table", "side_table", "floor_lamp", "rug"],
+    "armchair": ["side_table", "floor_lamp"],
+    "lounge_chair": ["side_table", "floor_lamp"],
+    "coffee_table": ["sofa", "armchair"],
+    "dining_table": ["dining_chair", "pendant"],
+    "dining_chair": ["dining_table"],
+    "double_bed": ["nightstand", "wardrobe", "floor_lamp"],
+    "queen_bed": ["nightstand", "wardrobe", "floor_lamp"],
+    "nightstand": ["double_bed", "queen_bed", "table_lamp"],
+    "coffee_station": ["bar_stool", "kitchen_counter"]
+  },
+  "semantic_tag_vocabulary": {
+    "rooms": ["office", "home_office", "study", "living_room", "bedroom", "dining_room", "kitchen", "bathroom", "lobby", "outdoor", "bar", "cafe"],
+    "purpose": ["work", "rest", "dining", "storage", "decoration", "lighting", "circulation"],
+    "audience": ["residential", "commercial", "hospitality"],
+    "ambience": ["minimal", "cozy", "industrial", "classic", "modern", "luxury", "vintage", "rustic"],
+    "architecture": ["house", "two_story"]
+  }
+}

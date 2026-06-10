@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://blender-asset-library/catalog_schema_v2.json",
+  "title": "BlenderAgent Asset Catalog (v2)",
+  "type": "object",
+  "required": ["library_name", "version", "assets"],
+  "properties": {
+    "library_name": {"type": "string"},
+    "version":      {"type": "string"},
+    "default_unit": {"type": "string", "enum": ["meters"]},
+    "coordinate_system": {"type": "string"},
+    "categories_taxonomy": {
+      "type": "object",
+      "additionalProperties": {"type": "array", "items": {"type": "string"}}
+    },
+    "semantic_tag_vocabulary": {
+      "type": "object",
+      "additionalProperties": {"type": "array", "items": {"type": "string"}}
+    },
+    "assets": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/Asset"}
+    }
+  },
+
+  "$defs": {
+    "Asset": {
+      "type": "object",
+      "required": [
+        "id", "name", "category", "subcategory",
+        "file", "dimensions_m",
+        "semantic_tags", "room_types", "is_container",
+        "footprint", "placement", "scale_class"
+      ],
+      "properties": {
+        "id":          {"type": "string", "pattern": "^[a-z0-9_]+$"},
+        "name":        {"type": "string"},
+        "category":    {"type": "string"},
+        "subcategory": {"type": "string"},
+        "style":       {"type": "array", "items": {"type": "string"}},
+        "tags":        {"type": "array", "items": {"type": "string"}},
+
+        "semantic_tags": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Theme/intent keywords for natural-language search (e.g. 'office', 'work', 'cozy')."
+        },
+        "room_types": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Room types this asset belongs in (e.g. ['office','home_office'])."
+        },
+        "is_container": {
+          "type": "boolean",
+          "description": "True for buildings/houses that contain other assets."
+        },
+        "scale_class": {
+          "type": "string",
+          "enum": ["human", "architectural", "decor"],
+          "description": "Human-scale furniture, full architecture, or small decor."
+        },
+        "compatible_with": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Subcategory IDs that pair well with this asset (e.g. desk → ['office_chair','table_lamp'])."
+        },
+
+        "footprint": {
+          "type": "object",
+          "required": ["width_m", "depth_m", "height_m"],
+          "properties": {
+            "width_m":           {"type": "number"},
+            "depth_m":           {"type": "number"},
+            "height_m":          {"type": "number"},
+            "clearance_front_m": {"type": "number", "default": 0.0},
+            "clearance_sides_m": {"type": "number", "default": 0.0}
+          }
+        },
+
+        "placement": {
+          "type": "object",
+          "required": ["anchor", "forward_axis"],
+          "properties": {
+            "rules": {
+              "type": "array",
+              "items": {"type": "string"},
+              "description": "Soft hints: floor / wall_only / wall_optional / corner_only / center_ok / freestanding / world_origin / ground."
+            },
+            "anchor": {
+              "type": "string",
+              "enum": ["floor_center", "object_center", "wall_anchor", "ceiling_anchor"],
+              "description": "Where the model's pivot is — controls how location is interpreted."
+            },
+            "forward_axis": {
+              "type": "string",
+              "enum": ["+X", "-X", "+Y", "-Y"],
+              "description": "Which axis the model's FRONT face points to in its local space."
+            },
+            "facing_correction_z": {
+              "type": "number",
+              "description": "Legacy Z rotation correction in degrees. Computed from forward_axis if absent."
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0,
+              "description": "Auto-categorize confidence in the placement metadata."
+            }
+          }
+        },
+
+        "container_meta": {
+          "type": "object",
+          "description": "Present when is_container=true. Describes interior bounds and rooms.",
+          "properties": {
+            "floor_z_world": {"type": "number"},
+            "interior_bbox_local": {
+              "type": "object",
+              "properties": {
+                "min": {"type": "array", "items": {"type": "number"}, "minItems": 3, "maxItems": 3},
+                "max": {"type": "array", "items": {"type": "number"}, "minItems": 3, "maxItems": 3}
+              }
+            },
+            "entrance_local": {"type": "array", "items": {"type": "number"}, "minItems": 3, "maxItems": 3}
+          }
+        },
+
+        "rooms": {
+          "type": "array",
+          "description": "Container assets list named rooms with local-space offsets.",
+          "items": {
+            "type": "object",
+            "required": ["room_id", "room_type", "origin_offset_m", "dimensions_m"],
+            "properties": {
+              "room_id":         {"type": "string"},
+              "room_name":       {"type": "string"},
+              "floor":           {"type": "integer"},
+              "room_type":       {"type": "string"},
+              "origin_offset_m": {"type": "array", "items": {"type": "number"}, "minItems": 3, "maxItems": 3},
+              "dimensions_m":    {
+                "type": "object",
+                "properties": {
+                  "width":  {"type": "number"},
+                  "depth":  {"type": "number"},
+                  "height": {"type": "number"}
+                }
+              },
+              "interior_bbox_local": {
+                "type": "object",
+                "properties": {
+                  "min": {"type": "array", "items": {"type": "number"}, "minItems": 3, "maxItems": 3},
+                  "max": {"type": "array", "items": {"type": "number"}, "minItems": 3, "maxItems": 3}
+                }
+              }
+            }
+          }
+        },
+
+        "file":                {"type": "string"},
+        "texture_resolution":  {"type": "string"},
+        "material_slots":      {"type": "array"},
+        "textures":            {"type": "object"},
+        "dimensions_m": {
+          "type": "object",
+          "required": ["width", "depth", "height"],
+          "properties": {
+            "width":  {"type": "number"},
+            "depth":  {"type": "number"},
+            "height": {"type": "number"}
+          }
+        },
+        "origin":              {"type": "string", "description": "Legacy alias for placement.anchor."},
+        "facing_correction_z": {"type": "number", "description": "Legacy alias for placement.facing_correction_z."},
+        "poly_count":          {"type": "integer"},
+        "added_at":            {"type": "string"},
+        "source":              {"type": "string"}
+      }
+    }
+  }
+}
