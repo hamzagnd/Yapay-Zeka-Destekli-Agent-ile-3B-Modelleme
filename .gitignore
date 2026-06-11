@@ -67,6 +67,7 @@ zip/
 *.rar
 *.tar
 *.tar.gz
+docs/Yapay Zeka Destekli Agent ile 3B Modelleme.pptx
 # (Eklenti zip'ini takip etmek istersen aşağıdaki satırı aç)
 # !asset-library-mcp/asset_library_mcp_addon.zip
 
